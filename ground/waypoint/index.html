@@ -84,9 +84,25 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../ackermann_control/">阿克曼控制</a>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../carla_perception_control/">传感器感知与给定轨迹跟踪（神经网络版）</a>
+</li>
 <li class="toctree-l1 current"><a class="reference internal current" href="#">路径点发布器</a>
 <ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="#_2">参考</a>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#_3">拓展：自行实现「给定轨迹的神经网络跟踪控制」</a>
+<ul>
+<li class="toctree-l3"><a class="reference internal" href="#_4">与本文示例的区别</a>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#_5">复用本文的配置步骤</a>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#_6">本拓展新增的内容</a>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#_7">运行本拓展模块</a>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#_8">实测结果</a>
+</li>
+</ul>
 </li>
 </ul>
 </li>
@@ -178,14 +194,173 @@
 <div class="document" itemscope="itemscope" itemtype="http://schema.org/Article" role="main">
 <div class="section" itemprop="articleBody">
 <div><h1 id="_1">路径点发布器</h1>
+<p>本文介绍 CARLA ROS Bridge 中的<strong>路径点发布器</strong>：它由 CARLA 地图导出道路中心线，
+以话题形式发布给其它节点使用，属于 <code>carla_ros_bridge</code> 的既有功能。</p>
 <h2 id="_2">参考</h2>
 <ul>
 <li><a href="https://openhutb.github.io/doc/carla_waypoint/">Carla 路径点发布器</a></li>
-</ul></div>
+</ul>
+<h2 id="_3">拓展：自行实现「给定轨迹的神经网络跟踪控制」</h2>
+<p>本文的路径点发布器只负责<strong>发布</strong>路径点，车辆如何沿路径点行驶由其它节点决定。
+下面是在该功能基础上<strong>自主实现</strong>的一套「传感器感知 + 给定轨迹跟踪」控制，
+代码位于
+<a href="https://github.com/OpenHUTB/ros2/tree/master/src/ground/carla_perception_control"><code>src/ground/carla_perception_control</code></a>，
+详细介绍（计算原理、源码解析、性能评价）见
+<a href="../carla_perception_control/">传感器感知与给定轨迹跟踪（神经网络版）</a>。</p>
+<h3 id="_4">与本文示例的区别</h3>
+<table>
+<thead>
+<tr>
+<th>对比项</th>
+<th>本文示例（路径点发布器）</th>
+<th>本拓展模块</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>技术路线</td>
+<td><code>carla_ros_bridge</code> 的 waypoint publisher 发布路径点话题</td>
+<td>CARLA Python API 直连 + 自研感知/控制节点</td>
+</tr>
+<tr>
+<td>是否依赖 ros-bridge</td>
+<td>必须编译并运行 ros-bridge</td>
+<td><strong>不需要</strong>，仅需 <code>carla</code> Python 客户端</td>
+</tr>
+<tr>
+<td>功能范围</td>
+<td>只发布路径点，不含控制</td>
+<td>完整闭环：传感器 → 感知 → 控制 → 车辆</td>
+</tr>
+<tr>
+<td>感知环节</td>
+<td>无</td>
+<td><strong>感知神经网络</strong>：RGB + 深度 + 雷达 → 障碍方向</td>
+</tr>
+<tr>
+<td>控制环节</td>
+<td>由外部节点自行订阅并控制</td>
+<td><strong>控制神经网络</strong>：状态 → 转向角</td>
+</tr>
+<tr>
+<td>算法性质</td>
+<td>地图几何查询</td>
+<td>两个可训练神经网络（纯 numpy 反向传播）</td>
+</tr>
+<tr>
+<td>无 CARLA / 无图形界面时</td>
+<td>无法运行</td>
+<td><code>--headless --demo</code> 离线自证并导出曲线图</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_5">复用本文的配置步骤</h3>
+<p>CARLA 服务端的启动、宿主机 IP 与端口 2000 的查看、虚拟机网络设置等步骤
+<strong>与已有示例完全一致，此处不再重复</strong>，请参考
+<a href="../../set_up_and_connect_to_carla/">设置并连接到 Carla 模拟器</a> 的
+「启动 Carla 服务器」与「使用 Carla 客户端启动 Ego Vehicle」小节；
+连接失败的排查见同一篇的「常见问题」小节。</p>
+<div class="admonition warning">
+<p class="admonition-title">不要从头到尾照做已有示例</p>
+<p>已有示例中的「设置 Carla ROS Bridge」「使用 rviz 进行可视化」等小节属于
+<strong>ros-bridge 路线</strong>（需要 catkin 编译 ros-bridge）。本拓展模块<strong>不依赖 ros-bridge</strong>，
+这些步骤可以跳过。</p>
+</div>
+<h3 id="_6">本拓展新增的内容</h3>
+<ol>
+<li><strong>感知神经网络</strong>：三路传感器（RGB 相机、深度相机、32 线激光雷达）压缩为 4 维归一化特征，
+   由 MLP 分类器（4→12→3）输出障碍方向（无目标 / 偏左 / 偏右）。</li>
+<li><strong>控制神经网络</strong>：状态 (航向差, 前视距离) → 转向角，MLP 策略网络（2→32→1），
+   tanh 输出保证转向落在 <script type="math/tex">[-1,1]</script>。</li>
+<li><strong>几何监督标签</strong>：控制网络的训练标签由纯跟踪几何律解析生成，
+   免去人工标注。</li>
+<li><strong>前视追踪 + 路点加密 + 垂距误差</strong>：把稀疏给定轨迹加密到 2 m 间距，
+   用前视点选取目标，用点到折线垂距度量横向误差。</li>
+<li><strong>弯道自适应减速 + 终点停车</strong>：按航向差自动降油门，进入终点 5 m 内刹车。</li>
+<li><strong>离线取证模式</strong>：<code>--headless --demo</code> 无需 CARLA、无需图形界面即可跑通全链路，
+   并导出损失/误差曲线 PNG。</li>
+</ol>
+<h3 id="_7">运行本拓展模块</h3>
+<p>除本文所需环境外，只需补装 CARLA 0.9.16 的 Python 客户端
+（神经网络为纯 numpy 实现，无需 TensorFlow/PyTorch）：</p>
+<div class="highlight"><pre><span></span><code>pip3<span class="w"> </span>install<span class="w"> </span>&lt;CARLA&gt;/PythonAPI/carla/dist/carla-0.9.16-cp310-cp310-manylinux_2_31_x86_64.whl
+</code></pre></div>
+<p>离线训练两个神经网络（<strong>不需要 CARLA</strong>）：</p>
+<div class="highlight"><pre><span></span><code>python3<span class="w"> </span>src/ground/carla_perception_control/main.py<span class="w"> </span>--mode<span class="w"> </span>train<span class="w"> </span>--epochs<span class="w"> </span><span class="m">300</span>
+</code></pre></div>
+<p>在线感知 + 沿给定轨迹跟踪（<code>--host</code> 的填法与本文一致：填宿主机 IP）。
+<strong>省略 <code>--waypoints</code> 即使用模块内置的 <code>DEMO_ROUTE</code></strong>
+（26 个航点，已逐点校验在车道上，含两个约 90° 弯）：</p>
+<div class="highlight"><pre><span></span><code>python3<span class="w"> </span>src/ground/carla_perception_control/main.py<span class="w"> </span>--mode<span class="w"> </span>run<span class="w"> </span><span class="se">\</span>
+<span class="w">        </span>--host<span class="w"> </span><span class="m">172</span>.21.108.47<span class="w"> </span>--sim_time<span class="w"> </span><span class="m">90</span><span class="w"> </span>--save_dir<span class="w"> </span>~/shots
+</code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">给定轨迹务必落在车道上、且弯道处加密</p>
+<p>航点之间是直线连接：航点若在路面外，车会开出路面撞停；
+转弯处航点间距过大会让车来不及转弯（前视距离仅 6 m）。
+详见 <a href="../carla_perception_control/">传感器感知与给定轨迹跟踪（神经网络版）</a> 5.7 节。</p>
+</div>
+<p>使用 launch 启动（ROS 2 / ROS 1）：</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># ROS 2</span>
+ros2<span class="w"> </span>launch<span class="w"> </span>carla_perception_control<span class="w"> </span>main.launch.py<span class="w"> </span>host:<span class="o">=</span><span class="m">172</span>.21.108.47
+<span class="c1"># ROS 1</span>
+roslaunch<span class="w"> </span>carla_perception_control<span class="w"> </span>main.launch<span class="w"> </span>host:<span class="o">=</span><span class="m">172</span>.21.108.47
+</code></pre></div>
+<h3 id="_8">实测结果</h3>
+<p>离线取证模式实测（<code>--epochs 300 --sim_time 90</code>，无需 CARLA）：</p>
+<table>
+<thead>
+<tr>
+<th>指标</th>
+<th>数值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>感知 NN 训练集准确率</td>
+<td>0.995</td>
+</tr>
+<tr>
+<td>控制 NN 训练集 MSE</td>
+<td>0.00303</td>
+</tr>
+<tr>
+<td>横向误差 RMSE</td>
+<td><strong>0.249 m</strong>（含两个约 90° 弯）</td>
+</tr>
+</tbody>
+</table>
+<p>在线连接 CARLA 服务端实测（<code>--mode run --sim_time 90</code>，Town05）：</p>
+<table>
+<thead>
+<tr>
+<th>指标</th>
+<th>数值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>横向误差 RMSE</td>
+<td><strong>1.012 m</strong></td>
+</tr>
+<tr>
+<td>是否到达终点</td>
+<td>是（t=28.9 s）</td>
+</tr>
+<tr>
+<td>相机帧数 / 导出截图</td>
+<td>577 帧 / 28 张</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="横向误差随时间的收敛曲线" src="../../img/ground/carla_lateral_error.png"/></p>
+<p><img alt="控制神经网络输出的转向指令" src="../../img/ground/carla_steer_cmd.png"/></p>
+<p>完整的调优过程与性能评价见
+<a href="../carla_perception_control/">传感器感知与给定轨迹跟踪（神经网络版）</a> 第 6 节。</p></div>
 </div>
 </div><footer>
 <div aria-label="Footer Navigation" class="rst-footer-buttons" role="navigation">
-<a class="btn btn-neutral float-left" href="../ackermann_control/" title="阿克曼控制"><span class="icon icon-circle-arrow-left"></span> 前一页</a>
+<a class="btn btn-neutral float-left" href="../carla_perception_control/" title="传感器感知与给定轨迹跟踪（神经网络版）"><span class="icon icon-circle-arrow-left"></span> 前一页</a>
 <a class="btn btn-neutral float-right" href="../ad_agent/" title="自动驾驶代理">后一页 <span class="icon icon-circle-arrow-right"></span></a>
 </div>
 <hr/>
@@ -203,7 +378,7 @@
 <span>
 <a href="https://github.com/OpenHUTB/ros2" style="color: #fcfcfc">OpenHUTB</a>
 </span>
-<span><a href="../ackermann_control/" style="color: #fcfcfc">« 前一页</a></span>
+<span><a href="../carla_perception_control/" style="color: #fcfcfc">« 前一页</a></span>
 <span><a href="../ad_agent/" style="color: #fcfcfc">后一页 »</a></span>
 </span>
 </div>
