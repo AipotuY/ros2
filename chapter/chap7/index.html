@@ -667,18 +667,28 @@ roslaunch<span class="w"> </span>smartcar_description<span class="w"> </span>sma
 <p><img alt="Rviz 俯视点云" src="../../img/code/chap7/21_rviz_pointcloud_top.png"/></p>
 <p>点云轮廓与真实障碍物的位置、形状完全吻合，表明小车的运动控制与激光雷达数据链路均工作正常。</p>
 <h2 id="10">10. 常见问题</h2>
-<p><strong>Q1：启动后 Gazebo 中看不到射线或传感器没有数据？</strong></p>
+<p><strong>Q1：加载小车模型出现如下两个崩溃界面怎么办？</strong></p>
+<p><img alt="警告1" src="../../img/code/chap7/26_warning.png"/></p>
+<p><img alt="警告2" src="../../img/code/chap7/27_warning.png"/></p>
+<p>这不是崩溃，添加以下两个命令即可解决：
+</p><div class="highlight"><pre><span></span><code>sed<span class="w"> </span>-i<span class="w"> </span><span class="s1">'155,156d'</span><span class="w"> </span>~/catkin_ws/src/chap7/smartcar_control/CMakeLists.txt
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>~/catkin_ws
+catkin_make
+</code></pre></div>
+<p>编译末尾出现 <code>[100%]</code> 且无 error 即成功。</p>
+<p><strong>Q2：启动后 Gazebo 中看不到射线或传感器没有数据？</strong></p>
 <p>确认是通过 <code>roslaunch</code> 启动，而不是先手动运行 <code>gazebo</code>。手动启动的无插件实例会被 Gazebo 单例机制复用，导致 ROS 插件无法注册。先执行 <code>killall gzserver gzclient</code> 关闭所有实例，再使用启动文件。</p>
-<p><strong>Q2：修改 xacro 文件后效果没有变化？</strong></p>
+<p><strong>Q3：修改 xacro 文件后效果没有变化？</strong></p>
 <p>Gazebo 不会热加载模型，必须先 <code>killall gzserver gzclient</code>，再重新执行 roslaunch。</p>
-<p><strong>Q3：终端持续刷 <code>TF_REPEATED_DATA</code> 警告？</strong></p>
+<p><strong>Q4：终端持续刷 <code>TF_REPEATED_DATA</code> 警告？</strong></p>
 <p>官方 joint_state_publisher 与 Gazebo 同时发布主动关节状态。关闭该节点，改用工程提供的 <code>front_wheel_jsp.py</code> 只补全两个前轮关节。</p>
-<p><strong>Q4：Insert 选项卡中的在线模型库无法加载？</strong></p>
+<p><strong>Q5：Insert 选项卡中的在线模型库无法加载？</strong></p>
 <p>在线模型库在国内网络环境下经常无法访问，属于网络问题。本章使用 Gazebo 内置几何体（Box 等）即可完成验证，不影响实验。</p>
 <p><img alt="在线模型库无法访问" src="../../img/code/chap7/07_insert_online_unavailable.png"/></p>
-<p><strong>Q5：Rviz 中 LaserScan 显示项没有自动出现？</strong></p>
+<p><strong>Q6：Rviz 中 LaserScan 显示项没有自动出现？</strong></p>
 <p>功能包复制到已存在的同名目录时可能发生目录嵌套，导致加载的仍是旧配置。删除旧目录后重新复制，或在 Rviz 中手动 <code>Add</code> → <code>LaserScan</code>，话题选择 <code>/laser/scan</code>。</p>
-<p><strong>Q6：键盘节点按键后小车没有反应？</strong></p>
+<p><strong>Q7：键盘节点按键后小车没有反应？</strong></p>
 <p>检查运行键盘节点的终端窗口是否获取鼠标焦点，并确认系统处于英文输入法状态；待机时终端持续打印全 0 数据属于正常现象。</p>
 <hr/>
 <p>本章完成了阿克曼四轮小车从 xacro 建模、xacro 旧语法修复、ros_control 控制器配置、阿克曼运动解算与键盘遥控，到激光雷达自扫故障排查和三传感器数据验证的完整流程，全部实验结果均在 Ubuntu 20.04 + ROS Noetic 环境下复现通过，工程代码位于仓库 <code>src/chap7</code> 目录。</p></div>
