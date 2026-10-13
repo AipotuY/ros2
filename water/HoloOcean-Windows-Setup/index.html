@@ -6,14 +6,14 @@
 <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <link href="../../img/favicon.ico" rel="shortcut icon"/>
-<title>HoloOcean Windows 本机环境搭建教程 - 模拟器的 ROS 文档</title>
+<title>HoloOcean Windows 本机环境搭建 - 模拟器的 ROS 文档</title>
 <link href="../../css/theme.css" rel="stylesheet"/>
 <link href="../../css/theme_extra.css" rel="stylesheet"/>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" rel="stylesheet"/>
 <link href="../../extra.css" rel="stylesheet"/>
 <script>
         // Current page data
-        var mkdocs_page_name = "HoloOcean Windows \u672c\u673a\u73af\u5883\u642d\u5efa\u6559\u7a0b";
+        var mkdocs_page_name = "HoloOcean Windows \u672c\u673a\u73af\u5883\u642d\u5efa";
         var mkdocs_page_input_path = "water/HoloOcean-Windows-Setup.md";
         var mkdocs_page_url = null;
       </script>
@@ -143,16 +143,44 @@
 </li>
 </ul>
 <p class="caption"><span class="caption-text">水域载具</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../HoloOcean/">水域载具 ROS2 接口</a>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../WSL_HoloOcean2_ROS2/">WSL跑通HoloOcean2的ROS2示例方法</a>
+<li class="toctree-l1 current"><a class="reference internal current">环境搭建</a>
+<ul class="current">
+<li class="toctree-l2 current"><a class="reference internal current" href="#">HoloOcean Windows 本机环境搭建</a>
+<ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="#_1">一、准备阶段</a>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#_2">二、创建并激活专属环境</a>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#holoocean-python">三、安装 HoloOcean Python 客户端</a>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#_3">四、下载场景包</a>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#_4">五、跑通第一个仿真</a>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../WSL_HoloOcean2_ROS2/">WSL跑通HoloOcean2的ROS2示例方法</a>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../docker/">Docker 开发环境</a>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../docker_runtime/">HoloOcean ROS2 运行时容器</a>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../holoocean_examples/">水域载具示例</a>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../rov_physical_simulation/">水下机器人物理仿真与 6-DOF 键盘运动控制</a>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../rov_trajectory_tracking/">水下多传感器感知与 3D 轨迹跟踪控制</a>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../rov_sonar_slam_navigation/">水下声呐 SLAM 占据栅格建图与自主避障导航</a>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ubuntu2004-local-llm-deploy/">自装ubuntu20.04本地大模型部署教程</a>
 </li>
 </ul>
 </div>
@@ -167,7 +195,9 @@
 <div class="rst-content"><div aria-label="breadcrumbs navigation" role="navigation">
 <ul class="wy-breadcrumbs">
 <li><a aria-label="Docs" class="icon icon-home" href="../.."></a></li>
-<li class="breadcrumb-item active">HoloOcean Windows 本机环境搭建教程</li>
+<li class="breadcrumb-item">水域载具</li>
+<li class="breadcrumb-item">环境搭建</li>
+<li class="breadcrumb-item active">HoloOcean Windows 本机环境搭建</li>
 <li class="wy-breadcrumbs-aside">
 <a href="https://github.com/OpenHUTB/ros2/edit/master/docs/water/HoloOcean-Windows-Setup.md"> 编辑页面</a>
 </li>
@@ -228,6 +258,10 @@
 </blockquote></div>
 </div>
 </div><footer>
+<div aria-label="Footer Navigation" class="rst-footer-buttons" role="navigation">
+<a class="btn btn-neutral float-left" href="../HoloOcean/" title="水域载具 ROS2 接口"><span class="icon icon-circle-arrow-left"></span> 前一页</a>
+<a class="btn btn-neutral float-right" href="../WSL_HoloOcean2_ROS2/" title="WSL跑通HoloOcean2的ROS2示例方法">后一页 <span class="icon icon-circle-arrow-right"></span></a>
+</div>
 <hr/>
 <div role="contentinfo">
 <!-- Copyright etc -->
@@ -243,6 +277,8 @@
 <span>
 <a href="https://github.com/OpenHUTB/ros2" style="color: #fcfcfc">OpenHUTB</a>
 </span>
+<span><a href="../HoloOcean/" style="color: #fcfcfc">« 前一页</a></span>
+<span><a href="../WSL_HoloOcean2_ROS2/" style="color: #fcfcfc">后一页 »</a></span>
 </span>
 </div>
 <script src="../../js/jquery-3.6.0.min.js"></script>
