@@ -68,7 +68,15 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal current" href="#">人形机器人基础</a>
 <ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="#_2">参考</a>
+<li class="toctree-l2"><a class="reference internal" href="#_2">前言</a>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#minicondamujoco">配置Miniconda和MuJoCo物理仿真环境教程</a>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#miniconda">一、安装 Miniconda</a>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#mujoco">二、安装 Mujoco</a>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#_3">参考</a>
 </li>
 </ul>
 </li>
@@ -200,7 +208,81 @@
 <div class="document" itemscope="itemscope" itemtype="http://schema.org/Article" role="main">
 <div class="section" itemprop="articleBody">
 <div><h1 id="_1">人形机器人基础</h1>
-<h2 id="_2">参考</h2>
+<h2 id="_2">前言</h2>
+<p>本章介绍了怎么配置并使用Mujoco作为机器人的仿真环境。</p>
+<h2 id="minicondamujoco">配置Miniconda和MuJoCo物理仿真环境教程</h2>
+<p>以下教程在已有ROS Noetic的Ubuntu20.04虚拟机中进行，隔离配置一个基于Conda的MuJoCo仿真环境。</p>
+<p>为了避免MuJoCo和ROS出现Python依赖冲突，且因为虚拟机硬盘和内存有限，所以选择更加轻量的Miniconda配置虚拟环境。</p>
+<h2 id="miniconda">一、安装 Miniconda</h2>
+<p>1、下载安装脚本</p>
+<p>打开终端，建议先回到主目录，然后下载安装脚本：</p>
+<div class="highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>~
+wget<span class="w"> </span>https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-x86_64.sh
+</code></pre></div>
+<p>2、运行安装脚本</p>
+<p>输入下面的代码安装</p>
+<div class="highlight"><pre><span></span><code>bash<span class="w"> </span>Miniconda3-latest-Linux-x86_64.sh
+</code></pre></div>
+<p>出现以下提示证明已经在许可协议页面了，持续按空格翻页</p>
+<div class="highlight"><pre><span></span><code>Welcome to Miniconda3
+In order to continue the installation process, please review the license agreement.
+Please, press ENTER to continue
+</code></pre></div>
+<p>接下来只要继续输入yes或回车同意就行了。</p>
+<p><strong>接下来是最关键的一步，如果你的电脑已经安装过其他版本的Mujoco或ros，在下面的选项一定要填no</strong></p>
+<div class="highlight"><pre><span></span><code>Do you wish the installer to initialize Miniconda3
+by running conda init? [yes|no]
+</code></pre></div>
+<p>最后输入以下代码激活conda环境</p>
+<div class="highlight"><pre><span></span><code><span class="nb">source</span><span class="w"> </span>~/miniconda3/bin/activate
+</code></pre></div>
+<p>输入下面的代码确认是否安装成功</p>
+<div class="highlight"><pre><span></span><code>conda<span class="w"> </span>--version
+</code></pre></div>
+<p>出现版本号就证明安装成功了。</p>
+<h2 id="mujoco">二、安装 Mujoco</h2>
+<p>1、接受服务条款</p>
+<p>打开bash终端，输入代码激活conda环境</p>
+<div class="highlight"><pre><span></span><code><span class="nb">source</span><span class="w"> </span>~/miniconda3/bin/activate
+</code></pre></div>
+<p>随后依次输入下面的代码进行授权</p>
+<div class="highlight"><pre><span></span><code>conda<span class="w"> </span>tos<span class="w"> </span>accept<span class="w"> </span>--override-channels<span class="w"> </span>--channel<span class="w"> </span>https://repo.anaconda.com/pkgs/main
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>conda<span class="w"> </span>tos<span class="w"> </span>accept<span class="w"> </span>--override-channels<span class="w"> </span>--channel<span class="w"> </span>https://repo.anaconda.com/pkgs/r
+</code></pre></div>
+<p>2、创建mujoco环境</p>
+<p>输入下面的代码创建mujoco环境</p>
+<div class="highlight"><pre><span></span><code>conda<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span>mujoco-grasp<span class="w"> </span><span class="nv">python</span><span class="o">=</span><span class="m">3</span>.10<span class="w"> </span>-y
+</code></pre></div>
+<p>创建完成之后激活环境</p>
+<div class="highlight"><pre><span></span><code>conda<span class="w"> </span>activate<span class="w"> </span>mujoco-grasp
+</code></pre></div>
+<p>看到命令行前缀从(base)变成(mujoco-grasp)，就可以了。</p>
+<p>确认环境可以正常激活之后输入下面的代码退出conda环境</p>
+<div class="highlight"><pre><span></span><code>conda<span class="w"> </span>deactivate
+</code></pre></div>
+<p>3、安装系统图形库</p>
+<p>输入下面的代码安装系统图形库</p>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>apt<span class="w"> </span>update
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>libglfw3<span class="w"> </span>libglew-dev<span class="w"> </span>libgl1-mesa-glx<span class="w"> </span>libosmesa6-dev<span class="w"> </span>patchelf
+</code></pre></div>
+<p>4、在 conda 环境里安装 MuJoCo</p>
+<p>进入(mujoco-grasp) 环境</p>
+<div class="highlight"><pre><span></span><code>conda<span class="w"> </span>activate<span class="w"> </span>mujoco-grasp
+</code></pre></div>
+<p>安装Mujoco和其他所需库</p>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>mujoco<span class="w"> </span>numpy<span class="w"> </span>scipy<span class="w"> </span>matplotlib
+</code></pre></div>
+<p>最后输入下面的代码验证是否安装成功</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-c<span class="w"> </span><span class="s2">"import mujoco; print(mujoco.__version__)"</span>
+</code></pre></div>
+<p>出现版本号就可以了</p>
+<p>最后每次要打开Mujoco就需要输入下面的代码进入环境</p>
+<div class="highlight"><pre><span></span><code><span class="nb">source</span><span class="w"> </span>~/miniconda3/bin/activate
+conda<span class="w"> </span>activate<span class="w"> </span>mujoco-grasp
+</code></pre></div>
+<h2 id="_3">参考</h2>
 <ul>
 <li><a href="https://openhutb.github.io/doc/pedestrian/humanoid/#humanoid_robot">人形机器人的示例</a></li>
 </ul></div>
