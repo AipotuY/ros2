@@ -101,6 +101,10 @@
 <ul>
 <li class="toctree-l3"><a class="reference internal" href="#61-ros-gazebo">6.1 用 ROS 方式启动 Gazebo</a>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="#62-ros">6.2 检查 ROS 话题</a>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#63-gazebo">6.3 在 Gazebo 中生成测试模型</a>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#64-launch">6.4 使用 launch 文件启动（推荐方式）</a>
 </li>
 </ul>
@@ -355,50 +359,58 @@
 </blockquote>
 <h2 id="install-ros-noetic">二、安装 ROS Noetic</h2>
 <h3 id="21-ros">2.1 配置 ROS 软件源</h3>
-<p>bash
-sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu focal main" &gt; /etc/apt/sources.list.d/ros-noetic.list'
-sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654</p>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>sh<span class="w"> </span>-c<span class="w"> </span><span class="s1">'echo "deb http://packages.ros.org/ros/ubuntu focal main" &gt; /etc/apt/sources.list.d/ros-noetic.list'</span>
+sudo<span class="w"> </span>apt-key<span class="w"> </span>adv<span class="w"> </span>--keyserver<span class="w"> </span><span class="s1">'hkp://keyserver.ubuntu.com:80'</span><span class="w"> </span>--recv-key<span class="w"> </span>C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
+</code></pre></div>
 <blockquote>
 <p>若官方源访问慢，可改用清华、中科大等国内镜像源。</p>
 </blockquote>
 <h3 id="22">2.2 更新并安装完整桌面版</h3>
 <p><strong>强烈建议安装 <code>ros-noetic-desktop-full</code></strong>，它已包含 Gazebo、RViz、rqt 等全套工具：</p>
-<p>sudo apt update
-sudo apt install ros-noetic-desktop-full</p>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>apt<span class="w"> </span>update
+sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>ros-noetic-desktop-full
+</code></pre></div>
 <h3 id="23-rosdep">2.3 初始化 rosdep</h3>
-<p>sudo apt install python3-rosdep2
-sudo rosdep init
-rosdep update</p>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>python3-rosdep2
+sudo<span class="w"> </span>rosdep<span class="w"> </span>init
+rosdep<span class="w"> </span>update
+</code></pre></div>
 <blockquote>
 <p>若因网络问题失败，可使用 <code>fishros</code> 一键配置工具或手动替换 <code>rosdistro</code> 为国内镜像。</p>
 </blockquote>
 <h3 id="24">2.4 配置环境变量</h3>
-<p>echo "source /opt/ros/noetic/setup.bash" &gt;&gt; ~/.bashrc
-source ~/.bashrc</p>
+<div class="highlight"><pre><span></span><code><span class="nb">echo</span><span class="w"> </span><span class="s2">"source /opt/ros/noetic/setup.bash"</span><span class="w"> </span>&gt;&gt;<span class="w"> </span>~/.bashrc
+<span class="nb">source</span><span class="w"> </span>~/.bashrc
+</code></pre></div>
 <h3 id="25-ros">2.5 验证 ROS 安装</h3>
-<p>roscore</p>
-<p>终端输出 ROS master 启动信息即表示成功（按 <code>Ctrl+C</code> 退出）。</p>
+<div class="highlight"><pre><span></span><code>roscore
+</code></pre></div>
+<p>终端输出 <code>ROS master</code> 启动信息即表示成功（按 <code>Ctrl+C</code> 退出）。</p>
 <h2 id="install-gazebo-classic11">三、安装 Gazebo Classic 11</h2>
 <blockquote>
 <p>若 <code>ros-noetic-desktop-full</code> 已安装成功，通常已包含 Gazebo 11。若终端输入 <code>gazebo</code> 提示 <code>Command not found</code>，则需要单独安装。</p>
 </blockquote>
 <h3 id="31-gazebo-11">3.1 安装 Gazebo 11 本体</h3>
-<p>sudo apt update
-sudo apt install gazebo11 libgazebo11-dev</p>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>apt<span class="w"> </span>update
+sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>gazebo11<span class="w"> </span>libgazebo11-dev
+</code></pre></div>
 <blockquote>
 <p><strong>关键点</strong>：必须显式指定 <code>gazebo11</code>，不要只敲 <code>sudo apt install gazebo</code>，否则系统可能会提示安装 <code>gazebo9</code>（版本不匹配）。</p>
 </blockquote>
 <h3 id="32-gazebo">3.2 验证 Gazebo 独立运行</h3>
-<p>gazebo</p>
-<p>应弹出 Gazebo GUI 窗口，左侧有 <code>Insert</code> 标签，中央显示网格和坐标轴。</p>
+<div class="highlight"><pre><span></span><code>gazebo
+</code></pre></div>
+<p>应弹出 <code>Gazebo GUI</code> 窗口，左侧有 <code>Insert</code> 标签，中央显示网格和坐标轴。</p>
 <h3 id="33">3.3 查看版本</h3>
-<p>gazebo --version</p>
+<div class="highlight"><pre><span></span><code>gazebo<span class="w"> </span>--version
+</code></pre></div>
 <p>期望输出类似：</p>
-<p>Gazebo multi-robot simulator, version 11.15.1</p>
+<p><code>Gazebo multi-robot simulator, version 11.15.1</code></p>
 <h2 id="install-gazebo-ros-pkgs">四、安装 gazebo_ros_pkgs（ROS 桥接包）</h2>
 <p><code>gazebo_ros_pkgs</code> 是 <strong>ROS 与 Gazebo 通信的桥梁</strong>，提供 <code>gazebo_ros</code> 节点、传感器 / 执行器插件等。</p>
 <h3 id="41">4.1 安装核心桥接包</h3>
-<p>sudo apt install ros-noetic-gazebo-ros-pkgs ros-noetic-gazebo-ros-control</p>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>ros-noetic-gazebo-ros-pkgs<span class="w"> </span>ros-noetic-gazebo-ros-control
+</code></pre></div>
 <p>表格</p>
 <table>
 <thead>
@@ -419,19 +431,23 @@ sudo apt install gazebo11 libgazebo11-dev</p>
 </tbody>
 </table>
 <h3 id="42">4.2 验证安装</h3>
-<p>rospack find gazebo_ros</p>
+<div class="highlight"><pre><span></span><code>rospack<span class="w"> </span>find<span class="w"> </span>gazebo_ros
+</code></pre></div>
 <p>期望输出：</p>
-<p>/opt/ros/noetic/share/gazebo_ros</p>
+<p><code>/opt/ros/noetic/share/gazebo_ros</code></p>
 <h2 id="config-env">五、配置环境变量</h2>
 <h3 id="51-gazebo">5.1 添加 Gazebo 模型路径</h3>
 <p>编辑 <code>~/.bashrc</code>，在末尾追加：</p>
-<p>export GAZEBO_MODEL_PATH=$GAZEBO_MODEL_PATH:/opt/ros/noetic/share/gazebo-11/models</p>
+<div class="highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">GAZEBO_MODEL_PATH</span><span class="o">=</span><span class="nv">$GAZEBO_MODEL_PATH</span>:/opt/ros/noetic/share/gazebo-11/models
+</code></pre></div>
 <h3 id="52-source-gazebo">5.2 source Gazebo 环境脚本</h3>
-<p>echo "source /usr/share/gazebo/setup.sh" &gt;&gt; ~/.bashrc
-source ~/.bashrc</p>
+<div class="highlight"><pre><span></span><code><span class="nb">echo</span><span class="w"> </span><span class="s2">"source /usr/share/gazebo/setup.sh"</span><span class="w"> </span>&gt;&gt;<span class="w"> </span>~/.bashrc
+<span class="nb">source</span><span class="w"> </span>~/.bashrc
+</code></pre></div>
 <h3 id="53">5.3 刷新命令缓存（可选）</h3>
 <p>若之前输入过 <code>gazebo</code> 提示找不到，执行以下命令刷新 bash 哈希表：</p>
-<p>hash -r</p>
+<div class="highlight"><pre><span></span><code><span class="nb">hash</span><span class="w"> </span>-r
+</code></pre></div>
 <h2 id="verify-ros-gazebo">六、验证 ROS + Gazebo 集成</h2>
 <h3 id="61-ros-gazebo">6.1 用 ROS 方式启动 Gazebo</h3>
 <blockquote>
@@ -440,36 +456,31 @@ source ~/.bashrc</p>
 新开终端都需要执行下面这条命令（前面已经写入<code>.bashrc</code>的话，新开终端会自动加载，不用手动敲）：
 </p><div class="highlight"><pre><span></span><code><span class="nb">source</span><span class="w"> </span>/opt/ros/noetic/setup.bash
 </code></pre></div>
-<div class="highlight"><pre><span></span><code>新开终端运行：rosrun<span class="w"> </span>gazebo_ros<span class="w"> </span>gazebo
-
-或使用<span class="w"> </span>launch<span class="w"> </span>文件（推荐）：
-
-roslaunch<span class="w"> </span>gazebo_ros<span class="w"> </span>empty_world.launch
-
-&gt;<span class="w"> </span>**注意**：建议使用<span class="w"> </span>ROS<span class="w"> </span>命令启动<span class="w"> </span>Gazebo，而不是直接敲<span class="w"> </span><span class="sb">`</span>gazebo<span class="sb">`</span>，这样能自动加载<span class="w"> </span>ROS<span class="w"> </span>插件、发布<span class="w"> </span><span class="sb">`</span>/clock<span class="sb">`</span>、<span class="sb">`</span>/gazebo/model_states<span class="sb">`</span><span class="w"> </span>等话题。
-
-<span class="c1">### 6.2 检查 ROS 话题</span>
-
-新开终端：
-
-rostopic<span class="w"> </span>list<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>gazebo
-
-应能看到：
-
-/gazebo/link_states
-/gazebo/model_states
-/gazebo/parameter_descriptions
-/gazebo/parameter_updates
-/gazebo/set_link_state
-/gazebo/set_model_state
-
-<span class="c1">### 6.3 在 Gazebo 中生成测试模型</span>
-
-新开终端：
-
-rosrun<span class="w"> </span>gazebo_ros<span class="w"> </span>spawn_model<span class="w"> </span>-database<span class="w"> </span>box<span class="w"> </span>-urdf<span class="w"> </span>-model<span class="w"> </span>test_box<span class="w"> </span>-x<span class="w"> </span><span class="m">1</span><span class="w"> </span>-y<span class="w"> </span><span class="m">0</span>
-</code></pre></div>
 </blockquote>
+<p>新开终端运行：</p>
+<div class="highlight"><pre><span></span><code>rosrun<span class="w"> </span>gazebo_ros<span class="w"> </span>gazebo
+</code></pre></div>
+<p>或使用 launch 文件（推荐）：</p>
+<div class="highlight"><pre><span></span><code>roslaunch<span class="w"> </span>gazebo_ros<span class="w"> </span>empty_world.launch
+</code></pre></div>
+<blockquote>
+<p><strong>注意</strong>：建议使用 ROS 命令启动 Gazebo，而不是直接敲 <code>gazebo</code>，这样能自动加载 ROS 插件、发布 <code>/clock</code>、<code>/gazebo/model_states</code> 等话题。</p>
+</blockquote>
+<h3 id="62-ros">6.2 检查 ROS 话题</h3>
+<p>新开终端：</p>
+<div class="highlight"><pre><span></span><code>rostopic<span class="w"> </span>list<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>gazebo
+</code></pre></div>
+<p>应能看到：</p>
+<p><code>/gazebo/link_states</code>
+<code>/gazebo/model_states</code>
+<code>/gazebo/parameter_descriptions</code>
+<code>/gazebo/parameter_updates</code>
+<code>/gazebo/set_link_state</code>
+<code>/gazebo/set_model_state</code></p>
+<h3 id="63-gazebo">6.3 在 Gazebo 中生成测试模型</h3>
+<p>新开终端：</p>
+<div class="highlight"><pre><span></span><code>rosrun<span class="w"> </span>gazebo_ros<span class="w"> </span>spawn_model<span class="w"> </span>-database<span class="w"> </span>box<span class="w"> </span>-urdf<span class="w"> </span>-model<span class="w"> </span>test_box<span class="w"> </span>-x<span class="w"> </span><span class="m">1</span><span class="w"> </span>-y<span class="w"> </span><span class="m">0</span>
+</code></pre></div>
 <h3 id="64-launch">6.4 使用 launch 文件启动（推荐方式）</h3>
 <p>在功能包内新建<code>launch/gazebo_test.launch</code>，写入：
 </p><div class="highlight"><pre><span></span><code><span class="nt">&lt;launch&gt;</span>
@@ -482,7 +493,7 @@ rosrun<span class="w"> </span>gazebo_ros<span class="w"> </span>spawn_model<span
 </code></pre></div>
 <p>CMakeLists.txt与package.xml文档在src/chap3代码中</p>
 <p>编译后运行：</p>
-<div class="highlight"><pre><span></span><code>roslaunch any_avoidance gazebo_test.launch
+<div class="highlight"><pre><span></span><code>roslaunch<span class="w"> </span>any_avoidance<span class="w"> </span>gazebo_test.launch
 </code></pre></div>
 <h2 id="experiment-result">七、实验结果</h2>
 <h3 id="71">7.1 实验环境</h3>
@@ -570,13 +581,14 @@ rosrun<span class="w"> </span>gazebo_ros<span class="w"> </span>spawn_model<span
 </ul>
 <h3 id="75">7.5 终端日志摘录</h3>
 <p>启动命令与输出：</p>
-<p>$ rosrun gazebo_ros gazebo
-context mismatch in svga_surface_destroy
-context mismatch in svga_surface_destroy</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>rosrun<span class="w"> </span>gazebo_ros<span class="w"> </span>gazebo
+context<span class="w"> </span>mismatch<span class="w"> </span><span class="k">in</span><span class="w"> </span>svga_surface_destroy
+context<span class="w"> </span>mismatch<span class="w"> </span><span class="k">in</span><span class="w"> </span>svga_surface_destroy
+</code></pre></div>
 <p>GUI 顶部提示：</p>
-<p>This version of Gazebo reaches end-of-life in January 2025. Consider migrating to the new Gazebo.</p>
+<p><code>This version of Gazebo reaches end-of-life in January 2025. Consider migrating to the new Gazebo.</code></p>
 <p>底部状态栏信息：</p>
-<p>Steps: 1 - Real Time Factor: 1.00 - Sim Time: 00:00:05.01.214 - Real Time: 00:00:05.01.892 - Iterations: 301214 - FPS: 62.53</p>
+<p><code>Steps: 1 - Real Time Factor: 1.00 - Sim Time: 00:00:05.01.214 - Real Time: 00:00:05.01.892 - Iterations: 301214 - FPS: 62.53</code></p>
 <h2 id="faq">八、常见问题与解决方案</h2>
 <h3 id="81">8.1 报错速查表</h3>
 <p>表格</p>
@@ -665,8 +677,9 @@ rospack find gazebo_ros_control
 echo "=========== 检查完成 ==========="
 </code></pre></div>
 <p>赋予执行权限并运行：</p>
-<p>chmod +x check_gazebo_ros.sh
-./check_gazebo_ros.sh</p>
+<div class="highlight"><pre><span></span><code>chmod<span class="w"> </span>+x<span class="w"> </span>check_gazebo_ros.sh
+./check_gazebo_ros.sh
+</code></pre></div>
 <h2 id="next-study">十、后续学习建议</h2>
 <h3 id="101">10.1 控制与算法</h3>
 <ul>
@@ -697,35 +710,42 @@ echo "=========== 检查完成 ==========="
 </code></pre></div>
 <h3 id="112">11.2 额外环境依赖</h3>
 <p>在原有 Gazebo‑ROS 仿真环境基础上，还需要安装深度学习库：</p>
-<p>pip3 install torch numpy
-sudo apt install python3-rospkg</p>
+<div class="highlight"><pre><span></span><code>pip3<span class="w"> </span>install<span class="w"> </span>torch<span class="w"> </span>numpy
+sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>python3-rospkg
+</code></pre></div>
 <h3 id="113">11.3 操作步骤</h3>
 <ol>
 <li>编译功能包</li>
 </ol>
-<p>catkin_make
-注意： catkin_make  需要在catkin工作空间根目录（ ~/catkin_ws ）执行。如果直接在家目录运行，会提示  src does not exist 。
+<div class="highlight"><pre><span></span><code>catkin_make
+</code></pre></div>
+<p>注意： catkin_make  需要在catkin工作空间根目录（ ~/catkin_ws ）执行。如果直接在家目录运行，会提示  src does not exist 。
 工作空间目录结构： ~/catkin_ws/src/功能包名</p>
 <ol>
 <li>刷新工作空间环境变量</li>
 </ol>
-<p>source devel/setup.bash</p>
+<div class="highlight"><pre><span></span><code><span class="nb">source</span><span class="w"> </span>devel/setup.bash
+</code></pre></div>
 <ol>
 <li>执行训练脚本，生成模型权重文件 <code>model.pth</code></li>
 </ol>
-<p>python3 src/nn_avoidance/nn_avoidance/train.py</p>
+<div class="highlight"><pre><span></span><code>python3<span class="w"> </span>src/nn_avoidance/nn_avoidance/train.py
+</code></pre></div>
 <ol>
 <li>加载权重，测试神经网络输出是否正常</li>
 </ol>
-<p>python3 src/nn_avoidance/nn_avoidance/test.py</p>
+<div class="highlight"><pre><span></span><code>python3<span class="w"> </span>src/nn_avoidance/nn_avoidance/test.py
+</code></pre></div>
 <p>5.新开终端启动Gazebo仿真环境，自动生成带激光雷达的Turtlebot3小车</p>
-<p>export TURTLEBOT3_MODEL=burger
-roslaunch turtlebot3_gazebo turtlebot3_world.launch
-Gazebo 仿真环境正常启动，小车激光雷达话题 <code>/scan</code> 正常发布后，运行避障节点</p>
+<p></p><div class="highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">TURTLEBOT3_MODEL</span><span class="o">=</span>burger
+roslaunch<span class="w"> </span>turtlebot3_gazebo<span class="w"> </span>turtlebot3_world.launch
+</code></pre></div>
+Gazebo 仿真环境正常启动，小车激光雷达话题 <code>/scan</code> 正常发布后，运行避障节点
 <p>6.先把训练出来的文件<code>model.pth</code>放入内层nn_avoidance文件夹中，再新开终端，刷新环境变量，运行避障节点。</p>
-<p>cd ~/catkin_ws
-source devel/setup.bash
-roslaunch nn_avoidance avoid.launch</p>
+<div class="highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>~/catkin_ws
+<span class="nb">source</span><span class="w"> </span>devel/setup.bash
+roslaunch<span class="w"> </span>nn_avoidance<span class="w"> </span>avoid.launch
+</code></pre></div>
 <h3 id="114">11.4 代码功能说明</h3>
 <ol>
 <li><strong>train.py</strong>
@@ -744,28 +764,33 @@ launch 启动文件，简化操作，一键启动神经网络避障推理节点�
 <p>本章前面完成了 Ubuntu20.04 下 ROS Noetic 与 Gazebo Classic11 完整仿真环境部署；在此基础上开展拓展实验，实现神经网络小车避障。</p>
 <h2 id="_2">附录：快速命令速查</h2>
 <h1 id="-">--- 安装 ---</h1>
-<p>sudo apt install ros-noetic-desktop-full
-sudo apt install gazebo11 libgazebo11-dev
-sudo apt install ros-noetic-gazebo-ros-pkgs ros-noetic-gazebo-ros-control</p>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>ros-noetic-desktop-full
+sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>gazebo11<span class="w"> </span>libgazebo11-dev
+sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>ros-noetic-gazebo-ros-pkgs<span class="w"> </span>ros-noetic-gazebo-ros-control
+</code></pre></div>
 <h1 id="-_1">--- 环境配置 ---</h1>
-<p>echo "source /opt/ros/noetic/setup.bash" &gt;&gt; ~/.bashrc
-echo "source /usr/share/gazebo/setup.sh" &gt;&gt; ~/.bashrc
-source ~/.bashrc
-hash -r</p>
+<div class="highlight"><pre><span></span><code><span class="nb">echo</span><span class="w"> </span><span class="s2">"source /opt/ros/noetic/setup.bash"</span><span class="w"> </span>&gt;&gt;<span class="w"> </span>~/.bashrc
+<span class="nb">echo</span><span class="w"> </span><span class="s2">"source /usr/share/gazebo/setup.sh"</span><span class="w"> </span>&gt;&gt;<span class="w"> </span>~/.bashrc
+<span class="nb">source</span><span class="w"> </span>~/.bashrc
+<span class="nb">hash</span><span class="w"> </span>-r
+</code></pre></div>
 <h1 id="-_2">--- 启动 ---</h1>
-<p>gazebo                                              # 独立启动
-rosrun gazebo_ros gazebo                            # ROS 方式启动
-roslaunch gazebo_ros empty_world.launch             # Launch 启动</p>
+<div class="highlight"><pre><span></span><code>gazebo<span class="w">                                              </span><span class="c1"># 独立启动</span>
+rosrun<span class="w"> </span>gazebo_ros<span class="w"> </span>gazebo<span class="w">                            </span><span class="c1"># ROS 方式启动</span>
+roslaunch<span class="w"> </span>gazebo_ros<span class="w"> </span>empty_world.launch<span class="w">             </span><span class="c1"># Launch 启动</span>
+</code></pre></div>
 <h1 id="-_3">--- 验证 ---</h1>
-<p>rostopic list | grep gazebo
-rospack find gazebo_ros
-gazebo --version</p>
+<div class="highlight"><pre><span></span><code>rostopic<span class="w"> </span>list<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>gazebo
+rospack<span class="w"> </span>find<span class="w"> </span>gazebo_ros
+gazebo<span class="w"> </span>--version
+</code></pre></div>
 <h1 id="-_4">---神经网络避障实验---</h1>
-<p>catkin_make
-source devel/setup.bash
-python3 src/nn_avoidance/nn_avoidance/train.py
-python3 src/nn_avoidance/nn_avoidance/test.py
-roslaunch nn_avoidance avoid.launch</p></div>
+<div class="highlight"><pre><span></span><code>catkin_make
+<span class="nb">source</span><span class="w"> </span>devel/setup.bash
+python3<span class="w"> </span>src/nn_avoidance/nn_avoidance/train.py
+python3<span class="w"> </span>src/nn_avoidance/nn_avoidance/test.py
+roslaunch<span class="w"> </span>nn_avoidance<span class="w"> </span>avoid.launch
+</code></pre></div></div>
 </div>
 </div><footer>
 <div aria-label="Footer Navigation" class="rst-footer-buttons" role="navigation">
