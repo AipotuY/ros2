@@ -6,14 +6,14 @@
 <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <link href="../../img/favicon.ico" rel="shortcut icon"/>
-<title>5. 机器人感知 - 模拟器的 ROS 文档</title>
+<title>章节首页 - 模拟器的 ROS 文档</title>
 <link href="../../css/theme.css" rel="stylesheet"/>
 <link href="../../css/theme_extra.css" rel="stylesheet"/>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" rel="stylesheet"/>
 <link href="../../extra.css" rel="stylesheet"/>
 <script>
         // Current page data
-        var mkdocs_page_name = "5. \u673a\u5668\u4eba\u611f\u77e5";
+        var mkdocs_page_name = "\u7ae0\u8282\u9996\u9875";
         var mkdocs_page_input_path = "chapter/chap5.md";
         var mkdocs_page_url = null;
       </script>
@@ -53,8 +53,18 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../chap4/">4. 机器人仿真</a>
 </li>
-<li class="toctree-l1 current"><a class="reference internal current" href="#">5. 机器人感知</a>
+<li class="toctree-l1 current"><a class="reference internal current">5. 机器人感知</a>
 <ul class="current">
+<li class="toctree-l2 current"><a class="reference internal current" href="#">章节首页</a>
+<ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="#_1">已收录模块</a>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#_2">后续规划模块（占位）</a>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lidar_obstacle_nn/">激光雷达 NN 障碍物分类</a>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../chap6/">6. 机器人 SLAM 与自主导航</a>
@@ -190,7 +200,8 @@
 <ul class="wy-breadcrumbs">
 <li><a aria-label="Docs" class="icon icon-home" href="../.."></a></li>
 <li class="breadcrumb-item">ROS 教程</li>
-<li class="breadcrumb-item active">5. 机器人感知</li>
+<li class="breadcrumb-item">5. 机器人感知</li>
+<li class="breadcrumb-item active">章节首页</li>
 <li class="wy-breadcrumbs-aside">
 <a href="https://github.com/OpenHUTB/ros2/edit/master/docs/chapter/chap5.md"> 编辑页面</a>
 </li>
@@ -199,12 +210,30 @@
 </div>
 <div class="document" itemscope="itemscope" itemtype="http://schema.org/Article" role="main">
 <div class="section" itemprop="articleBody">
-<h1 id="_1"></h1>
+<div><h1 id="5">第5章 机器人感知</h1>
+<p>本章介绍基于 ROS 2 与神经网络的多模态传感器感知模块。每个模块都自包含源代码、训练脚本、Gazebo 仿真场景与 launch 入口，并满足 OpenHUTB/ros2 仓库的提交约定（<code>main.py</code> 入口、launch 启动、全英文文件名、<code>docs/</code> + <code>src/</code> 目录约定）。</p>
+<h2 id="_1">已收录模块</h2>
+<ul>
+<li><a href="lidar_obstacle_nn/">基于激光雷达扫描的神经网络障碍物分类</a></li>
+<li>仿真器：Gazebo Fortress 6.x</li>
+<li>传感器：360 束 2D GPU LiDAR（<code>sensor_msgs/LaserScan</code>）</li>
+<li>神经网络：三层 PyTorch MLP（360→128→128→3）</li>
+<li>任务：把每条扫描分类为 <code>near</code> / <code>far</code> / <code>free</code> 三类</li>
+<li>源代码：<a href="https://github.com/OpenHUTB/ros2/tree/master/src/chap5/lidar_obstacle_nn"><code>src/chap5/lidar_obstacle_nn/</code></a></li>
+</ul>
+<h2 id="_2">后续规划模块（占位）</h2>
+<p>以下方向待补，作为后续 PR 的增量提交：</p>
+<ul>
+<li>相机目标检测（YOLOv8 + Gazebo 仿真相机）</li>
+<li>深度相机避障 NN（深度图 → 速度指令）</li>
+<li>激光雷达 + 相机融合感知</li>
+<li>感知→运动控制闭环（感知结果驱动 cmd_vel）</li>
+</ul></div>
 </div>
 </div><footer>
 <div aria-label="Footer Navigation" class="rst-footer-buttons" role="navigation">
 <a class="btn btn-neutral float-left" href="../chap4/" title="4. 机器人仿真"><span class="icon icon-circle-arrow-left"></span> 前一页</a>
-<a class="btn btn-neutral float-right" href="../chap6/" title="6. 机器人 SLAM 与自主导航">后一页 <span class="icon icon-circle-arrow-right"></span></a>
+<a class="btn btn-neutral float-right" href="lidar_obstacle_nn/" title="激光雷达 NN 障碍物分类">后一页 <span class="icon icon-circle-arrow-right"></span></a>
 </div>
 <hr/>
 <div role="contentinfo">
@@ -222,7 +251,7 @@
 <a href="https://github.com/OpenHUTB/ros2" style="color: #fcfcfc">OpenHUTB</a>
 </span>
 <span><a href="../chap4/" style="color: #fcfcfc">« 前一页</a></span>
-<span><a href="../chap6/" style="color: #fcfcfc">后一页 »</a></span>
+<span><a href="lidar_obstacle_nn/" style="color: #fcfcfc">后一页 »</a></span>
 </span>
 </div>
 <script src="../../js/jquery-3.6.0.min.js"></script>
