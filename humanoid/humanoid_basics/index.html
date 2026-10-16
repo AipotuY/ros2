@@ -82,7 +82,17 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#mujoco">二、安装 Mujoco</a>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#_3">参考</a>
+<li class="toctree-l2"><a class="reference internal" href="#_3">三、代码示例</a>
+<ul>
+<li class="toctree-l3"><a class="reference internal" href="#1">1. 文件位置</a>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#2">2. 核心代码</a>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#3">3、运行效果</a>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#_4">参考</a>
 </li>
 </ul>
 </li>
@@ -297,12 +307,54 @@ by running conda init? [yes|no]
 </code></pre></div>
 <p>出现版本号就可以了</p>
 <p>最后每次要打开Mujoco就需要输入下面的代码进入环境</p>
-<p></p><div class="highlight"><pre><span></span><code><span class="nb">source</span><span class="w"> </span>~/miniconda3/bin/activate
+<div class="highlight"><pre><span></span><code><span class="nb">source</span><span class="w"> </span>~/miniconda3/bin/activate
 conda<span class="w"> </span>activate<span class="w"> </span>mujoco-grasp
 </code></pre></div>
+<h2 id="_3">三、代码示例</h2>
+<p>下面是一个MuJoCo小球自由落体测试脚本，用来简单测试。</p>
+<h3 id="1">1. 文件位置</h3>
+<p>完整代码的仓库路径<a href="../../src/humanoid/mujoco_demo/falling_ball.py">src/humanoid/mujoco_demo/falling_ball.py</a></p>
+<h3 id="2">2. 核心代码</h3>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">mujoco</span>
+<span class="kn">import</span> <span class="nn">mujoco.viewer</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="c1"># 定义模型</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">mujoco</span><span class="o">.</span><span class="n">MjModel</span><span class="o">.</span><span class="n">from_xml_string</span><span class="p">(</span><span class="s2">"""</span>
+<span class="s2">    &lt;mujoco&gt;</span>
+<span class="s2">    &lt;option gravity = "0 0 -10"/&gt;</span>
+<span class="s2">        &lt;worldbody&gt;</span>
+<span class="s2">            &lt;light pos = "0 0 5"/&gt;</span>
+<span class="s2">            &lt;geom type = "plane" size = "2 2 0.1" rgba = ".9 .9 .9 1"/&gt;</span>
+<span class="s2">                &lt;body pos = "0 0 4"&gt;</span>
+<span class="s2">                &lt;freejoint/&gt;</span>
+<span class="s2">                &lt;geom type = "sphere" size = "0.1" rgba = ".5 .5 .5 2" solref = "0.01 0.5"/&gt;</span>
+<span class="s2">            &lt;/body&gt;</span>
+<span class="s2">        &lt;/worldbody&gt;</span>
+<span class="s2">    &lt;/mujoco&gt;</span>
+<span class="s2">"""</span><span class="p">)</span>
+
+<span class="c1"># 创建数据对象</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">mujoco</span><span class="o">.</span><span class="n">MjData</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+
+<span class="c1"># 启动循环</span>
+<span class="k">with</span> <span class="n">mujoco</span><span class="o">.</span><span class="n">viewer</span><span class="o">.</span><span class="n">launch_passive</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span> <span class="k">as</span> <span class="n">viewer</span><span class="p">:</span>
+    <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+    <span class="k">while</span> <span class="n">viewer</span><span class="o">.</span><span class="n">is_running</span><span class="p">()</span> <span class="ow">and</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">):</span>
+
+        <span class="n">mujoco</span><span class="o">.</span><span class="n">mj_step</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+        <span class="n">viewer</span><span class="o">.</span><span class="n">sync</span><span class="p">()</span>
+
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">opt</span><span class="o">.</span><span class="n">timestep</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="3">3、运行效果</h3>
+<p>如图所示，运行之后会弹出一个窗口，内容是一个小球从高处坠落，运行10秒后自动关闭。
+<img alt="示例" src="../../img/humanoid/falling_ball.png"/>
 成功事例截图：
-<img alt="alt text" src="../../img/mujoco1.png"/>
-<h2 id="_3">参考</h2>
+<img alt="alt text" src="../../img/mujoco1.png"/></p>
+<h2 id="_4">参考</h2>
 <ul>
 <li><a href="https://openhutb.github.io/doc/pedestrian/humanoid/#humanoid_robot">人形机器人的示例</a></li>
 </ul></div>
