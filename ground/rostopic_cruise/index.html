@@ -136,9 +136,11 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#_7">命令参数展示</a>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#_8">常见问题</a>
+<li class="toctree-l2"><a class="reference internal" href="#_8">其他常用命令</a>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#_9">参考</a>
+<li class="toctree-l2"><a class="reference internal" href="#_9">常见问题</a>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#_10">参考</a>
 </li>
 </ul>
 </li>
@@ -267,21 +269,13 @@
 <div class="section" itemprop="articleBody">
 <div><h1 id="carla-ros-rostopic">CARLA + ROS 桥接后，用 rostopic 发布控制命令驱动车辆</h1>
 <h2 id="_1">简介</h2>
-<p>在 Ubuntu 20.04 实体机 上完成 CARLA 与 ROS 桥接后，用 rostopic 直接向主车发布控制命令驱动车辆行驶。</p>
+<p>在 Ubuntu 20.04 实体机上完成 CARLA 与 ROS 桥接后，用 rostopic 直接向主车发布控制命令驱动车辆行驶。</p>
 <h2 id="_2">环境要求</h2>
 <ul>
-<li>
-<p>Ubuntu 20.04 实体机（非虚拟机）</p>
-</li>
-<li>
-<p>CARLA 0.9.13（安装目录下运行 <code>./CarlaUE4.sh</code> 启动服务器）</p>
-</li>
-<li>
-<p>ROS Noetic</p>
-</li>
-<li>
-<p>carla-ros-bridge（工作区 <code>~/carla-ros-bridge/catkin_ws</code>，已编译）</p>
-</li>
+<li>Ubuntu 20.04 实体机（非虚拟机）</li>
+<li>CARLA 0.9.13（安装目录下运行 <code>./CarlaUE4.sh</code> 启动服务器）</li>
+<li>ROS Noetic</li>
+<li>carla-ros-bridge（工作区 <code>~/carla-ros-bridge/catkin_ws</code>，已编译）</li>
 </ul>
 <h2 id="_3">配套代码</h2>
 <p>本教程对应的代码位于仓库 <code>src/ground/rostopic_cruise/</code> 目录，与下面各步骤的命令一一对应：</p>
@@ -316,6 +310,26 @@
 <tr>
 <td>发布制动命令</td>
 <td><code>src/ground/rostopic_cruise/stop.sh</code></td>
+</tr>
+<tr>
+<td>列出话题</td>
+<td><code>src/ground/rostopic_cruise/list_topics.sh</code></td>
+</tr>
+<tr>
+<td>回显车辆状态</td>
+<td><code>src/ground/rostopic_cruise/echo_status.sh</code></td>
+</tr>
+<tr>
+<td>查看话题类型与频率</td>
+<td><code>src/ground/rostopic_cruise/inspect_topic.sh</code></td>
+</tr>
+<tr>
+<td>查看 ROS 节点</td>
+<td><code>src/ground/rostopic_cruise/rosnode_view.sh</code></td>
+</tr>
+<tr>
+<td>发布倒车命令</td>
+<td><code>src/ground/rostopic_cruise/reverse.sh</code></td>
 </tr>
 </tbody>
 </table>
@@ -353,15 +367,9 @@
 <p><em>演示动图：发布制动命令（油门 0、刹车 1）后，车辆从 24 km/h 减速至停止</em></p>
 <h2 id="_6">效果说明</h2>
 <ul>
-<li>
-<p>发布控制命令后，CARLA 窗口中的主车以油门 0.5 起步直行前进。</p>
-</li>
-<li>
-<p><code>Ctrl + C</code> 停止发布后，发布制动命令，车辆逐渐减速停下。</p>
-</li>
-<li>
-<p>调整 <code>throttle</code>（油门）和 <code>steer</code>（转向）数值，可改变车辆速度和行驶方向。</p>
-</li>
+<li>发布控制命令后，CARLA 窗口中的主车以油门 0.5 起步直行前进。</li>
+<li><code>Ctrl + C</code> 停止发布后，发布制动命令，车辆逐渐减速停下。</li>
+<li>调整 <code>throttle</code>（油门）和 <code>steer</code>（转向）数值，可改变车辆速度和行驶方向。</li>
 </ul>
 <h2 id="_7">命令参数展示</h2>
 <p><code>rostopic pub</code> 命令中的各参数含义与取值：</p>
@@ -422,26 +430,39 @@
 <p>修改命令示例（加速并左转）：</p>
 <div class="highlight"><pre><span></span><code>rostopic<span class="w"> </span>pub<span class="w"> </span>-r<span class="w"> </span><span class="m">20</span><span class="w"> </span>/carla/ego_vehicle/vehicle_control_cmd<span class="w"> </span>carla_msgs/CarlaEgoVehicleControl<span class="w"> </span><span class="s2">"{throttle: 0.8, steer: 0.3, brake: 0.0, hand_brake: false, reverse: false, gear: 1, manual_gear_shift: false}"</span>
 </code></pre></div>
-<h2 id="_8">常见问题</h2>
+<h2 id="_8">其他常用命令</h2>
+<p>查看当前所有话题（确认桥接后有哪些话题）：</p>
+<div class="highlight"><pre><span></span><code>rostopic<span class="w"> </span>list
+</code></pre></div>
+<p>回显主车状态消息（实时查看车速、转向等信息，<code>Ctrl + C</code> 退出）：</p>
+<div class="highlight"><pre><span></span><code>rostopic<span class="w"> </span><span class="nb">echo</span><span class="w"> </span>/carla/ego_vehicle/vehicle_status
+</code></pre></div>
+<blockquote>
+<p>若提示话题不存在，先运行 <code>rostopic list</code> 确认实际话题名。</p>
+</blockquote>
+<p>查看控制话题的类型与发布频率：</p>
+<div class="highlight"><pre><span></span><code>rostopic<span class="w"> </span><span class="nb">type</span><span class="w"> </span>/carla/ego_vehicle/vehicle_control_cmd
+
+rostopic<span class="w"> </span>hz<span class="w"> </span>/carla/ego_vehicle/vehicle_control_cmd
+</code></pre></div>
+<p>查看当前 ROS 节点：</p>
+<div class="highlight"><pre><span></span><code>rosnode<span class="w"> </span>list
+
+rosnode<span class="w"> </span>info<span class="w"> </span>/carla_ros_bridge
+</code></pre></div>
+<p>倒车示例（<code>reverse: true</code>、倒挡 <code>gear: -1</code>）：</p>
+<div class="highlight"><pre><span></span><code>rostopic<span class="w"> </span>pub<span class="w"> </span>-r<span class="w"> </span><span class="m">20</span><span class="w"> </span>/carla/ego_vehicle/vehicle_control_cmd<span class="w"> </span>carla_msgs/CarlaEgoVehicleControl<span class="w"> </span><span class="s2">"{throttle: 0.3, steer: 0.0, brake: 0.0, hand_brake: false, reverse: true, gear: -1, manual_gear_shift: false}"</span>
+</code></pre></div>
+<h2 id="_9">常见问题</h2>
 <ul>
-<li>
-<p><strong>roslaunch 提示找不到包</strong>：功能包没编译或没在环境里，执行 <code>catkin_make</code> 后重新 <code>source devel/setup.bash</code></p>
-</li>
-<li>
-<p><strong>rostopic pub 报错话题不存在</strong>：确认终端 2 的 roslaunch 已正常运行、主车已生成</p>
-</li>
-<li>
-<p><strong>黑屏 / 看不到车</strong>：等地图加载完再启动 launch；确认 <code>host:=localhost</code>（同一台机器）</p>
-</li>
+<li><strong>roslaunch 提示找不到包</strong>：功能包没编译或没在环境里，执行 <code>catkin_make</code> 后重新 <code>source devel/setup.bash</code></li>
+<li><strong>rostopic pub 报错话题不存在</strong>：确认终端 2 的 roslaunch 已正常运行、主车已生成</li>
+<li><strong>黑屏 / 看不到车</strong>：等地图加载完再启动 launch；确认 <code>host:=localhost</code>（同一台机器）</li>
 </ul>
-<h2 id="_9">参考</h2>
+<h2 id="_10">参考</h2>
 <ul>
-<li>
-<p><a href="../../set_up_and_connect_to_carla/">设置并连接到 Carla 模拟器</a></p>
-</li>
-<li>
-<p><a href="https://carla.readthedocs.io/en/0.9.13/core_actors/#autopilot">Carla Autopilot 官方文档</a></p>
-</li>
+<li><a href="../../set_up_and_connect_to_carla/">设置并连接到 Carla 模拟器</a></li>
+<li><a href="https://carla.readthedocs.io/en/0.9.13/core_actors/#autopilot">Carla Autopilot 官方文档</a></li>
 </ul></div>
 </div>
 </div><footer>
