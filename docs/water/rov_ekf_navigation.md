@@ -14,9 +14,47 @@ IMU、DVL、深度计与姿态量测，输出连续、带协方差的位姿估�
 纯 IMU 积分会随时间平方发散——本模块的基线实验里，60 s 航程 21.5 m，
 航位推算终点偏差达到 **348 m**。
 
-## 2. 算法
+## 2. 文件结构
 
-### 2.1 状态定义
+新增与修改的文件都集中在 `rov_mujoco` 包内，不新建功能包：
+
+```text
+src/water/rov_mujoco/
+├── rov_mujoco/
+│   ├── ekf_fusion.py          # 15 状态 ESKF + 航位推算基线 + 传感器噪声模型（纯 numpy）
+│   ├── sensor_sim_node.py     # 由真值合成 IMU / DVL / 深度 / 姿态（零偏、噪声、丢包）
+│   ├── ekf_node.py            # 融合节点：/rov/odom_fused、/rov/odom_deadreckoning
+│   └── mujoco_sim_node.py     # [修改] 改用仿真时间打戳，新增 /clock 发布
+├── launch/
+│   └── ekf_nav.launch.py      # 仿真 + 噪声传感器 + EKF 一键启动
+├── test/
+│   └── test_ekf.py            # 无头自动评测：RMSE / 漂移 / NEES
+└── setup.py                   # [修改] 新增 sensor_sim_node、ekf_nav_node 入口
+
+docs/
+├── water/rov_ekf_navigation.md    # 本文档
+└── img/water/ekf_*.png            # 4 张实测图
+mkdocs.yml                         # [修改] 「水域载具」下新增一行导航
+```
+
+数据流：
+
+```text
+MuJoCo 仿真 ──/rov/odom(真值)──> 传感器噪声仿真 ──┬── /rov/imu_noisy ──┐
+                                                  ├── /rov/dvl ────────┤
+                                                  └── /rov/depth_noisy ┤
+                                                                       v
+                                                                    EKF 节点
+                                                                       │
+                                          ┌────────────────────────────┴─────────────────┐
+                                          v                                              v
+                                  /rov/odom_fused                          /rov/odom_deadreckoning
+                                  （含位姿协方差）                              （纯 IMU 基线）
+```
+
+## 3. 算法
+
+### 3.1 状态定义
 
 标称状态：位置 $\mathbf p$、速度 $\mathbf v$、姿态四元数 $\mathbf q$、
 加速度计零偏 $\mathbf b_a$、陀螺零偏 $\mathbf b_g$。
@@ -28,7 +66,7 @@ $$
 \delta\mathbf b_a,\ \delta\mathbf b_g]^\top
 $$
 
-### 2.2 预测（IMU）
+### 3.2 预测（IMU）
 
 $$
 \mathbf a_w = \mathbf R(\mathbf q)(\mathbf a_m - \mathbf b_a) + \mathbf g,\qquad
@@ -37,7 +75,7 @@ $$
 $$
 
 $$
-\mathbf q \leftarrow \mathbf q \otimes \exp\!\big(\tfrac12(\boldsymbol\omega_m-\mathbf b_g)\Delta t\big)
+\mathbf q \leftarrow \mathbf q \otimes \exp\!\left(\tfrac12(\boldsymbol\omega_m-\mathbf b_g)\Delta t\right)
 $$
 
 误差状态转移矩阵（关键块）：
@@ -54,7 +92,7 @@ $$
 
 过程噪声按加速度/陀螺噪声谱密度与零偏随机游走注入。
 
-### 2.3 量测更新
+### 3.3 量测更新
 
 | 量测 | 模型 | 维度 |
 | --- | --- | --- |
@@ -64,7 +102,7 @@ $$
 
 每次更新用 Joseph 形式保持协方差正定，误差注入标称状态后清零。
 
-## 3. 传感器噪声模型
+## 4. 传感器噪声模型
 
 `sensor_sim_node` 从仿真真值合成带误差的传感器，参数可在 launch 中调整：
 
@@ -76,7 +114,7 @@ $$
 | 深度计 | σ = 0.02 m | — | — |
 | 姿态 | σ = 0.01 rad | — | — |
 
-## 4. ROS 2 接口
+## 5. ROS 2 接口
 
 | 话题 | 类型 | 方向 |
 | --- | --- | --- |
@@ -91,7 +129,7 @@ $$
 参数：`init_delay`（传感器上线后等待多久再初始化滤波器，默认 0.1 s）、
 `sigma_acc/sigma_gyro/sigma_dvl/sigma_depth/sigma_att`（滤波器噪声）。
 
-## 5. 运行
+## 6. 运行
 
 ```bash
 cd ~/ros2_ws
@@ -111,7 +149,7 @@ python3 src/water/rov_mujoco/test/test_ekf.py --duration 60 --out /tmp/ekf_eval.
 常用参数：`--dropout 0.3`（DVL 丢包率）、`--current 0`（关闭洋流）、
 `--seed 11`（换随机种子）、`--facc/--fgyro/--fdvl/--fdepth`（滤波器噪声）。
 
-## 6. 实验结果
+## 7. 实验结果
 
 每个场景 60 s、约 1.7 圈三维螺旋航迹（航程 21.4–21.5 m），
 起点前 6 s 为控制器预热，EKF 从 6 s 起初始化。
@@ -139,14 +177,14 @@ NEES（归一化估计误差平方）检验"误差是否与滤波器宣称的协
 说明滤波器过度自信；把过程噪声与量测噪声调到与真实噪声匹配后为 4.19 / 98.4%**。
 这一项比 RMSE 更能说明滤波器是否"可信"。
 
-## 7. 与已有模块的关系
+## 8. 与已有模块的关系
 
 - `mujoco_sim_node`：提供真值与物理仿真，本模块只读 `/rov/odom` 作为"传感器真值源"；
 - `sonar_slam_node` / `autonomous_navigation_node`：把输入从 `/rov/odom` 换成
   `/rov/odom_fused` 即可接入真实噪声条件下的定位（后续可做）；
 - `nn_trajectory_controller`：控制器不受影响，仍订阅 `/cmd_vel`。
 
-## 8. 排错
+## 9. 排错
 
 | 现象 | 原因 | 处理 |
 | --- | --- | --- |
@@ -155,7 +193,7 @@ NEES（归一化估计误差平方）检验"误差是否与滤波器宣称的协
 | NEES 长期 < 1 | 过度保守 | 减小 `--facc/--fdvl` |
 | 仿真很慢 | 物理频率 500 Hz | 调低 `sim_rate`（test 脚本用同步步进，不受影响） |
 
-## 9. 配套修正：仿真节点必须用仿真时间打戳（重要）
+## 10. 配套修正：仿真节点必须用仿真时间打戳（重要）
 
 调试中发现的**基础仿真缺陷**：`mujoco_sim_node` 原来用墙钟
 （`self.get_clock().now()`）给 `/rov/odom`、`/rov/imu` 等消息打时间戳，
@@ -176,7 +214,7 @@ self.pub_clock.publish(Clock(clock=now))   # 新增 /clock 发布者
 
 下游若使用 `use_sim_time:=true`，`/clock` 也会让 RViz、TF 与仿真时间一致。
 
-## 10. ROS 端到端验证
+## 11. ROS 端到端验证
 
 `ros2 launch rov_mujoco ekf_nav.launch.py` 启动三个节点
 （仿真 + 噪声传感器 + EKF），同时订阅 `/rov/odom_fused` 与
