@@ -216,35 +216,37 @@
 <ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="#1">1. 为什么需要它</a>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#2">2. 算法</a>
+<li class="toctree-l2"><a class="reference internal" href="#2">2. 文件结构</a>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#3">3. 算法</a>
 <ul>
-<li class="toctree-l3"><a class="reference internal" href="#21">2.1 状态定义</a>
+<li class="toctree-l3"><a class="reference internal" href="#31">3.1 状态定义</a>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#22-imu">2.2 预测（IMU）</a>
+<li class="toctree-l3"><a class="reference internal" href="#32-imu">3.2 预测（IMU）</a>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#23">2.3 量测更新</a>
+<li class="toctree-l3"><a class="reference internal" href="#33">3.3 量测更新</a>
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#3">3. 传感器噪声模型</a>
+<li class="toctree-l2"><a class="reference internal" href="#4">4. 传感器噪声模型</a>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#4-ros-2">4. ROS 2 接口</a>
+<li class="toctree-l2"><a class="reference internal" href="#5-ros-2">5. ROS 2 接口</a>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#5">5. 运行</a>
+<li class="toctree-l2"><a class="reference internal" href="#6">6. 运行</a>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#6">6. 实验结果</a>
+<li class="toctree-l2"><a class="reference internal" href="#7">7. 实验结果</a>
 <ul>
 <li class="toctree-l3"><a class="reference internal" href="#nees">关于 NEES</a>
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#7">7. 与已有模块的关系</a>
+<li class="toctree-l2"><a class="reference internal" href="#8">8. 与已有模块的关系</a>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#8">8. 排错</a>
+<li class="toctree-l2"><a class="reference internal" href="#9">9. 排错</a>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#9">9. 配套修正：仿真节点必须用仿真时间打戳（重要）</a>
+<li class="toctree-l2"><a class="reference internal" href="#10">10. 配套修正：仿真节点必须用仿真时间打戳（重要）</a>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#10-ros">10. ROS 端到端验证</a>
+<li class="toctree-l2"><a class="reference internal" href="#11-ros">11. ROS 端到端验证</a>
 </li>
 </ul>
 </li>
@@ -286,8 +288,39 @@ IMU、DVL、深度计与姿态量测，输出连续、带协方差的位姿估�
 真实 ROV 没有"真值"：只有带零偏的 IMU、带噪声的深度计、会丢包的 DVL。
 纯 IMU 积分会随时间平方发散——本模块的基线实验里，60 s 航程 21.5 m，
 航位推算终点偏差达到 <strong>348 m</strong>。</p>
-<h2 id="2">2. 算法</h2>
-<h3 id="21">2.1 状态定义</h3>
+<h2 id="2">2. 文件结构</h2>
+<p>新增与修改的文件都集中在 <code>rov_mujoco</code> 包内，不新建功能包：</p>
+<div class="highlight"><pre><span></span><code>src/water/rov_mujoco/
+├── rov_mujoco/
+│   ├── ekf_fusion.py          # 15 状态 ESKF + 航位推算基线 + 传感器噪声模型（纯 numpy）
+│   ├── sensor_sim_node.py     # 由真值合成 IMU / DVL / 深度 / 姿态（零偏、噪声、丢包）
+│   ├── ekf_node.py            # 融合节点：/rov/odom_fused、/rov/odom_deadreckoning
+│   └── mujoco_sim_node.py     # [修改] 改用仿真时间打戳，新增 /clock 发布
+├── launch/
+│   └── ekf_nav.launch.py      # 仿真 + 噪声传感器 + EKF 一键启动
+├── test/
+│   └── test_ekf.py            # 无头自动评测：RMSE / 漂移 / NEES
+└── setup.py                   # [修改] 新增 sensor_sim_node、ekf_nav_node 入口
+
+docs/
+├── water/rov_ekf_navigation.md    # 本文档
+└── img/water/ekf_*.png            # 4 张实测图
+mkdocs.yml                         # [修改] 「水域载具」下新增一行导航
+</code></pre></div>
+<p>数据流：</p>
+<div class="highlight"><pre><span></span><code>MuJoCo 仿真 ──/rov/odom(真值)──&gt; 传感器噪声仿真 ──┬── /rov/imu_noisy ──┐
+                                                  ├── /rov/dvl ────────┤
+                                                  └── /rov/depth_noisy ┤
+                                                                       v
+                                                                    EKF 节点
+                                                                       │
+                                          ┌────────────────────────────┴─────────────────┐
+                                          v                                              v
+                                  /rov/odom_fused                          /rov/odom_deadreckoning
+                                  （含位姿协方差）                              （纯 IMU 基线）
+</code></pre></div>
+<h2 id="3">3. 算法</h2>
+<h3 id="31">3.1 状态定义</h3>
 <p>标称状态：位置 $\mathbf p$、速度 $\mathbf v$、姿态四元数 $\mathbf q$、
 加速度计零偏 $\mathbf b_a$、陀螺零偏 $\mathbf b_g$。</p>
 <p>误差状态（15 维）：</p>
@@ -297,7 +330,7 @@ IMU、DVL、深度计与姿态量测，输出连续、带协方差的位姿估�
 \delta\mathbf b_a,\ \delta\mathbf b_g]^\top
 </script>
 </p>
-<h3 id="22-imu">2.2 预测（IMU）</h3>
+<h3 id="32-imu">3.2 预测（IMU）</h3>
 <p>
 <script type="math/tex; mode=display">
 \mathbf a_w = \mathbf R(\mathbf q)(\mathbf a_m - \mathbf b_a) + \mathbf g,\qquad
@@ -307,7 +340,7 @@ IMU、DVL、深度计与姿态量测，输出连续、带协方差的位姿估�
 </p>
 <p>
 <script type="math/tex; mode=display">
-\mathbf q \leftarrow \mathbf q \otimes \exp\!\big(\tfrac12(\boldsymbol\omega_m-\mathbf b_g)\Delta t\big)
+\mathbf q \leftarrow \mathbf q \otimes \exp\!\left(\tfrac12(\boldsymbol\omega_m-\mathbf b_g)\Delta t\right)
 </script>
 </p>
 <p>误差状态转移矩阵（关键块）：</p>
@@ -323,7 +356,7 @@ IMU、DVL、深度计与姿态量测，输出连续、带协方差的位姿估�
 </script>
 </p>
 <p>过程噪声按加速度/陀螺噪声谱密度与零偏随机游走注入。</p>
-<h3 id="23">2.3 量测更新</h3>
+<h3 id="33">3.3 量测更新</h3>
 <table>
 <thead>
 <tr>
@@ -351,7 +384,7 @@ IMU、DVL、深度计与姿态量测，输出连续、带协方差的位姿估�
 </tbody>
 </table>
 <p>每次更新用 Joseph 形式保持协方差正定，误差注入标称状态后清零。</p>
-<h2 id="3">3. 传感器噪声模型</h2>
+<h2 id="4">4. 传感器噪声模型</h2>
 <p><code>sensor_sim_node</code> 从仿真真值合成带误差的传感器，参数可在 launch 中调整：</p>
 <table>
 <thead>
@@ -395,7 +428,7 @@ IMU、DVL、深度计与姿态量测，输出连续、带协方差的位姿估�
 </tr>
 </tbody>
 </table>
-<h2 id="4-ros-2">4. ROS 2 接口</h2>
+<h2 id="5-ros-2">5. ROS 2 接口</h2>
 <table>
 <thead>
 <tr>
@@ -444,7 +477,7 @@ IMU、DVL、深度计与姿态量测，输出连续、带协方差的位姿估�
 </table>
 <p>参数：<code>init_delay</code>（传感器上线后等待多久再初始化滤波器，默认 0.1 s）、
 <code>sigma_acc/sigma_gyro/sigma_dvl/sigma_depth/sigma_att</code>（滤波器噪声）。</p>
-<h2 id="5">5. 运行</h2>
+<h2 id="6">6. 运行</h2>
 <div class="highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>~/ros2_ws
 colcon<span class="w"> </span>build<span class="w"> </span>--packages-select<span class="w"> </span>rov_mujoco<span class="w"> </span>--symlink-install
 <span class="nb">source</span><span class="w"> </span>install/setup.bash
@@ -460,7 +493,7 @@ python3<span class="w"> </span>src/water/rov_mujoco/test/test_ekf.py<span class=
 </code></pre></div>
 <p>常用参数：<code>--dropout 0.3</code>（DVL 丢包率）、<code>--current 0</code>（关闭洋流）、
 <code>--seed 11</code>（换随机种子）、<code>--facc/--fgyro/--fdvl/--fdepth</code>（滤波器噪声）。</p>
-<h2 id="6">6. 实验结果</h2>
+<h2 id="7">7. 实验结果</h2>
 <p>每个场景 60 s、约 1.7 圈三维螺旋航迹（航程 21.4–21.5 m），
 起点前 6 s 为控制器预热，EKF 从 6 s 起初始化。</p>
 <table>
@@ -529,14 +562,14 @@ python3<span class="w"> </span>src/water/rov_mujoco/test/test_ekf.py<span class=
 3 自由度下理想均值为 3，95% 上界 7.815。<strong>调参前 NEES 均值 34.8（只有 12.4% 落在界内），
 说明滤波器过度自信；把过程噪声与量测噪声调到与真实噪声匹配后为 4.19 / 98.4%</strong>。
 这一项比 RMSE 更能说明滤波器是否"可信"。</p>
-<h2 id="7">7. 与已有模块的关系</h2>
+<h2 id="8">8. 与已有模块的关系</h2>
 <ul>
 <li><code>mujoco_sim_node</code>：提供真值与物理仿真，本模块只读 <code>/rov/odom</code> 作为"传感器真值源"；</li>
 <li><code>sonar_slam_node</code> / <code>autonomous_navigation_node</code>：把输入从 <code>/rov/odom</code> 换成
   <code>/rov/odom_fused</code> 即可接入真实噪声条件下的定位（后续可做）；</li>
 <li><code>nn_trajectory_controller</code>：控制器不受影响，仍订阅 <code>/cmd_vel</code>。</li>
 </ul>
-<h2 id="8">8. 排错</h2>
+<h2 id="9">9. 排错</h2>
 <table>
 <thead>
 <tr>
@@ -568,7 +601,7 @@ python3<span class="w"> </span>src/water/rov_mujoco/test/test_ekf.py<span class=
 </tr>
 </tbody>
 </table>
-<h2 id="9">9. 配套修正：仿真节点必须用仿真时间打戳（重要）</h2>
+<h2 id="10">10. 配套修正：仿真节点必须用仿真时间打戳（重要）</h2>
 <p>调试中发现的<strong>基础仿真缺陷</strong>：<code>mujoco_sim_node</code> 原来用墙钟
 （<code>self.get_clock().now()</code>）给 <code>/rov/odom</code>、<code>/rov/imu</code> 等消息打时间戳，
 而物理步进在虚拟机上<strong>跑不到 500 Hz 实时</strong>。后果是：下游按墙钟积分速度时，
@@ -583,7 +616,7 @@ python3<span class="w"> </span>src/water/rov_mujoco/test/test_ekf.py<span class=
 <span class="bp">self</span><span class="o">.</span><span class="n">pub_clock</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">Clock</span><span class="p">(</span><span class="n">clock</span><span class="o">=</span><span class="n">now</span><span class="p">))</span>   <span class="c1"># 新增 /clock 发布者</span>
 </code></pre></div>
 <p>下游若使用 <code>use_sim_time:=true</code>，<code>/clock</code> 也会让 RViz、TF 与仿真时间一致。</p>
-<h2 id="10-ros">10. ROS 端到端验证</h2>
+<h2 id="11-ros">11. ROS 端到端验证</h2>
 <p><code>ros2 launch rov_mujoco ekf_nav.launch.py</code> 启动三个节点
 （仿真 + 噪声传感器 + EKF），同时订阅 <code>/rov/odom_fused</code> 与
 <code>/rov/ground_truth</code> 对比（仿真时间戳修正后）：</p>
