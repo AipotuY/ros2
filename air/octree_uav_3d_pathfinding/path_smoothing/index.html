@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+
+<html class="writer-html5" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="../../../img/favicon.ico" rel="shortcut icon"/>
+<title>安全裕度与路径平滑 - 模拟器的 ROS 文档</title>
+<link href="../../../css/theme.css" rel="stylesheet"/>
+<link href="../../../css/theme_extra.css" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" rel="stylesheet"/>
+<link href="../../../extra.css" rel="stylesheet"/>
+<script>
+        // Current page data
+        var mkdocs_page_name = "\u5b89\u5168\u88d5\u5ea6\u4e0e\u8def\u5f84\u5e73\u6ed1";
+        var mkdocs_page_input_path = "air/octree_uav_3d_pathfinding/path_smoothing.md";
+        var mkdocs_page_url = null;
+      </script>
+<!--[if lt IE 9]>
+      <script src="../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+</head>
+<body class="wy-body-for-nav" role="document">
+<div class="wy-grid-for-nav">
+<nav class="wy-nav-side stickynav" data-toggle="wy-nav-shift">
+<div class="wy-side-scroll">
+<div class="wy-side-nav-search">
+<a class="icon icon-home" href="../../.."> 模拟器的 ROS 文档
+        </a><div role="search">
+<form action="../../../search.html" class="wy-form" id="rtd-search-form" method="get">
+<input aria-label="Search docs" name="q" placeholder="搜索文档" title="Type search term here" type="text"/>
+</form>
+</div>
+</div>
+<div aria-label="Navigation menu" class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation">
+<p class="caption"><span class="caption-text">入门</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../..">首页</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ubuntu20.04/">安装 ROS</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../chap2/ros2_pubsub_py/">ROS2 话题发布订阅基础实验（talker/listener）</a>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">ROS 教程</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../chapter/chap1/chap1/">1. 认识 ROS</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../chapter/chap2/">2. ROS 基础 - ROS 基础</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../chapter/chap3/">3. 机器人系统设计</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../chapter/chap4/">4. 机器人仿真</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../chapter/chap5/">5. 机器人感知</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../chapter/chap6/">6. 机器人 SLAM 与自主导航</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../chapter/chap7/">7. 阿克曼四轮小车运动控制</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../chapter/chap8/">8. ROS 机器人综合应用</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../chapter/chap9/">9. ROS 2</a>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">人形机器人</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../humanoid/humanoid_basics/">人形机器人基础</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../humanoid/humanoid_keyboard_control/">人形机器人键盘运动控制</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../humanoid/panda_keyboard_control/">键盘操控仿真机械臂</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../humanoid/humanoid_push_recovery/">人形机器人平衡控制与外力抗扰恢复</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../humanoid/humanoid_ppo_locomotion/">人形机器人 PPO 神经网络平衡控制</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../humanoid/humanoid_lidar_nn_perception/">人形机器人 2D 激光雷达 CNN 感知与避障</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../humanoid/mujoco_hopper_demo/">MuJoCo单足弹跳机器人简单仿真</a>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">肌肉骨骼人</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../musculoskeletal/musculoskeletal_basics/">肌肉骨骼人基础</a>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">地面载具</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../set_up_and_connect_to_carla/">手动控制</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ground/carla_spawn_objects/">生成对象</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ground/carla_keyboard_control/">地面载具物理仿真与键盘运动控制</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ground/ackermann_control/">阿克曼控制</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ground/carla_perception_control/">传感器感知与给定轨迹跟踪（神经网络版）</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ground/r2d2_cruise/">R2D2小车 自动巡航</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ground/waypoint/">路径点发布器</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ground/ad_agent/">自动驾驶代理</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ground/ad_demo/">自动驾驶示例</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ground/rostopic_cruise/">rostopic 手动驱动</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ground/ros_scenario_runner/">ROS Scenario Runner</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ground/rviz_plugin/">RVIZ Carla 插件</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ground/yolov8_target_tracking/">YOLOv8 视觉感知目标跟随</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ground/carla_tsr_ros/">交通标志识别 ROS 封装</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ground/vehicle_pygame_teleop/">车辆键盘遥操作与二维模拟</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ground/mujoco_diff_drive_slip_compensation/">MuJoCo 差速小车轮滑感知与轨迹补偿</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ground/car_2d_target_tracker/">2D 小车目标追踪仿真</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ground/carla_nn_car_following/">神经网络自适应跟车(ACC)</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ground/weather_perception_benchmark/">恶劣雨雾天气下多传感器感知性能对比实验</a>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">空域载具</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../payload_mass_estimation/">无人机载荷质量估计</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../flight_pattern_recognition/">无人机飞行轨迹类型识别与 ROS2 自动任务日志</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../telemetry_diagnostics/">无人机遥测异常检测与 ROS2 在线诊断</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../setup_and_connect/">建立虚拟机和空域载具之间的连接</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../ros_pkgs/">空域模拟器的 ROS 封装器</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../carlair_ros_bridge/">无人机与 ROS 的桥接模块</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../rooftop_landing/">无人机屋顶降落</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../uav_keyboard_control/">无人机键盘控制</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../uav_ppo_nav/">基于 PPO 的无人机导航避障</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../uav_rl_benchmark/">强化学习对比实验（PPO/SAC/TD3）</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../drone_teleop/">无人机终端键盘遥控器</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../drone_ros_teleop/">基于 ROS 消息解耦的无人机键盘遥控</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../state_prediction/">基于 GRU 的无人机飞行状态预测与 ROS2 在线误差分析</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../uav_mujoco_sim/">MuJoCo 四旋翼仿真与 ROS2 桥接底座</a>
+</li>
+<li class="toctree-l1"><a class="" href="https://openhutb.github.io/air_doc/airsim_tutorial_pkgs/">低空载具的 ROS 示例教程</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ap_cpp_overfomo/">AP-CPP 主动感知覆盖路径规划</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../waypoint_tracking/">无人机航点轨迹跟踪（PID 控制）</a>
+</li>
+<li class="toctree-l1 current"><a class="reference internal current">空域载具八叉树三维寻路</a>
+<ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../env_setup/">环境配置与前置准备</a>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../flight_control/">AirSim 载具与位置控制</a>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../occupancy_mapping/">点云转八叉树占用地图</a>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../astar_planning/">八叉树上的 A* 全局寻路</a>
+</li>
+<li class="toctree-l2 current"><a class="reference internal current" href="#">安全裕度与路径平滑</a>
+<ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="#1">1. 运行节点与话题关系</a>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#2">2. 为什么需要这一节</a>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#3">3. 关键认识：两种安全裕度不是平级的</a>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#4">4. 安全裕度（一）：地图膨胀 —— 硬约束</a>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#5">5. 安全裕度（二）：间隙惩罚 —— 软偏好</a>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#6">6. 路径平滑</a>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#7">7. 验证</a>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#8">8. 参数</a>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#9">9. 实现中踩到的坑（供参考）</a>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#10">10. 参考</a>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../openhutb_yolo_mlp_control/">YOLO目标检测与八字轨迹控制</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../no_fly_zone_check/">禁飞区检测</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../allocnet_teleop/">AllocNet 四旋翼避障规划与键盘遥操作</a>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">水域载具</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../water/HoloOcean/">水域载具 ROS2 接口</a>
+</li>
+<li class="toctree-l1"><a class="reference internal">环境搭建</a>
+<ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../water/HoloOcean-Windows-Setup/">HoloOcean Windows 本机环境搭建</a>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../water/WSL_HoloOcean2_ROS2/">WSL跑通HoloOcean2的ROS2示例方法</a>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../water/docker/">Docker 开发环境</a>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../water/docker_runtime/">HoloOcean ROS2 运行时容器</a>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../water/holoocean_examples/">水域载具示例</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../water/rov_physical_simulation/">水下机器人物理仿真与 6-DOF 键盘运动控制</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../water/rov_trajectory_tracking/">水下多传感器感知与 3D 轨迹跟踪控制</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../water/rov_sonar_slam_navigation/">水下声呐 SLAM 占据栅格建图与自主避障导航</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../water/mjc_rov_sonar_cnn/">侧扫声呐图像仿真与 CNN 海底目标分类</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../water/mjc_rov_current_teleop/">动态洋流 ROV 键盘遥操与 MLP 巡航控制</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../water/underwater_sonar_mapping/">新增水下三维地形测绘模块</a>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ubuntu2004-local-llm-deploy/">自装ubuntu20.04本地大模型部署教程</a>
+</li>
+</ul>
+</div>
+</div>
+</nav>
+<section class="wy-nav-content-wrap" data-toggle="wy-nav-shift">
+<nav aria-label="Mobile navigation menu" class="wy-nav-top" role="navigation">
+<i class="fa fa-bars" data-toggle="wy-nav-top"></i>
+<a href="../../..">模拟器的 ROS 文档</a>
+</nav>
+<div class="wy-nav-content">
+<div class="rst-content"><div aria-label="breadcrumbs navigation" role="navigation">
+<ul class="wy-breadcrumbs">
+<li><a aria-label="Docs" class="icon icon-home" href="../../.."></a></li>
+<li class="breadcrumb-item">空域载具</li>
+<li class="breadcrumb-item">空域载具八叉树三维寻路</li>
+<li class="breadcrumb-item active">安全裕度与路径平滑</li>
+<li class="wy-breadcrumbs-aside">
+<a href="https://github.com/OpenHUTB/ros2/edit/master/docs/air/octree_uav_3d_pathfinding/path_smoothing.md"> 编辑页面</a>
+</li>
+</ul>
+<hr/>
+</div>
+<div class="document" itemscope="itemscope" itemtype="http://schema.org/Article" role="main">
+<div class="section" itemprop="articleBody">
+<div><h1 id="_1">安全裕度与路径平滑</h1>
+<p>本文介绍空域载具八叉树三维寻路项目中的<strong>后处理环节</strong>：给上一节 A* 规划出的路径
+加上安全裕度，并把它平滑成控制器可以跟踪的光滑曲线。</p>
+<p>对应总纲第 5 节「安全裕度与路径平滑」。</p>
+<hr/>
+<h2 id="1">1. 运行节点与话题关系</h2>
+<p>本节的功能由 <code>astar_planner</code> 一个节点承担，它叠加在上一节的规划流程之上，
+因此先交代整条链路。<code>roslaunch octree_uav_3d_pathfinding main.launch</code>
+会启动下图除模拟器以外的全部节点：</p>
+<div class="mermaid">graph LR
+    SIM["Windows 宿主<br/>AirSim 模拟器<br/>RPC 41451"]
+
+    subgraph VM["Ubuntu 虚拟机 (ROS Noetic)"]
+        BR["airsim_bridge<br/>桥接节点"]
+        MAP["pointcloud_to_octomap<br/>建图节点"]
+        PLAN["astar_planner<br/>规划与平滑节点"]
+        RVIZ["rviz"]
+    end
+
+    SIM --&gt;|"RPC 41451 取点云与位姿"| BR
+    BR --&gt;|"/uav/goal 转 moveToPositionAsync"| SIM
+
+    BR --&gt;|"/cloud_in<br/>PointCloud2 10 Hz"| MAP
+    BR --&gt;|"TF world→base_link→lidar_link"| PLAN
+
+    MAP --&gt;|"/octomap_full<br/>Octomap latched"| PLAN
+
+    PLAN --&gt;|"/uav/path<br/>原始折线"| RVIZ
+    PLAN --&gt;|"/uav/path_smooth<br/>平滑后路径"| RVIZ
+
+    GOAL(["目标点<br/>/uav/goal"]) --&gt; PLAN
+    GOAL --&gt; BR
+</div>
+<p>整条链路上只有 <code>astar_planner</code> 一个节点是本项目新增的 <strong>C++ 节点</strong>，
+其余为桥接（Python）、建图（C++）与 RViz。各节点与话题的完整说明见
+上一节《八叉树上的 A* 全局寻路》。</p>
+<h3 id="11">1.1 各节点的职责</h3>
+<table>
+<thead>
+<tr>
+<th>节点</th>
+<th>可执行文件</th>
+<th>职责</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>airsim_bridge</code></td>
+<td><code>scripts/airsim_bridge.py</code></td>
+<td>通过 RPC 从宿主机 AirSim 取点云与位姿，发布 <code>/cloud_in</code>、<code>/ground_truth/odom</code>、<code>/uav/status</code> 与 TF；同时订阅 <code>/uav/goal</code>，把它转成 AirSim 的目标点调用</td>
+</tr>
+<tr>
+<td><code>pointcloud_to_octomap</code></td>
+<td><code>src/pointcloud_to_octomap.cpp</code></td>
+<td>订阅 <code>/cloud_in</code>，用 TF 变换后用 <code>insertPointCloud()</code> 做射线投射，发布 <code>/octomap_full</code>（latched）与 <code>/occupied_cells_vis_array</code></td>
+</tr>
+<tr>
+<td><code>astar_planner</code></td>
+<td><code>src/astar_planner.cpp</code></td>
+<td>订阅 <code>/octomap_full</code> 与 <code>/uav/goal</code>，查 TF 取起点，做 A* 规划；开启开关后叠加安全裕度与路径平滑，发布 <code>/uav/path</code>、<code>/uav/path_smooth</code>、<code>/uav/explored_markers</code></td>
+</tr>
+<tr>
+<td><code>rviz</code></td>
+<td>—</td>
+<td>显示点云、占用体素、两条路径与展开节点</td>
+</tr>
+</tbody>
+</table>
+<h3 id="12">1.2 本节的插入点</h3>
+<p>本节的两项功能都插在 <code>astar_planner</code> 内部，不新增节点、不新增输入话题：</p>
+<div class="mermaid">graph TD
+    CLOUD["/cloud_in<br/>PointCloud2 10 Hz"] --&gt; BR["airsim_bridge"]
+    BR --&gt;|"TF world→base_link"| PLAN
+    MAP["pointcloud_to_octomap"] --&gt;|"/octomap_full<br/>Octomap latched"| PLAN
+    GOAL(["目标点 /uav/goal"]) --&gt; PLAN
+
+    subgraph PLANNER["astar_planner 节点内部"]
+        A1["A* 规划<br/>（上一节：树遍历 + 跨分辨率邻接）"]
+        A2["安全裕度<br/>膨胀 = 硬约束 / 间隙惩罚 = 软偏好"]
+        A3["路径平滑<br/>捷径化 + 三次样条 + 复检"]
+        A1 --&gt; A2
+        A2 --&gt;|"原始折线"| RAW(["发布 /uav/path"])
+        A2 --&gt; A3
+        A3 --&gt;|"平滑曲线"| SM(["发布 /uav/path_smooth"])
+    end
+
+    MAP --&gt; BR
+    RAW --&gt; RVIZ["rviz<br/>两条路径同屏对比"]
+    SM --&gt; RVIZ
+</div>
+<p><strong>安全裕度作用于规划本身</strong>（把"贴障碍"变成"不可通行"），
+<strong>平滑作用于规划输出</strong>（把折线变成可跟踪的曲线）。
+两者都受同一套可通行判定约束，所以平滑不会把路径拉回障碍旁。</p>
+<p>两条路径<strong>并存发布</strong>，是为了在 RViz 里同屏对比平滑前后的差别：绿色是原始折线，
+青色是平滑后的曲线。</p>
+<h3 id="13">1.3 话题与数据流</h3>
+<table>
+<thead>
+<tr>
+<th>环节</th>
+<th>话题</th>
+<th>消息类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>点云</td>
+<td><code>/cloud_in</code></td>
+<td><code>sensor_msgs/PointCloud2</code></td>
+<td>桥接节点发布，约 10 Hz</td>
+</tr>
+<tr>
+<td>地图</td>
+<td><code>/octomap_full</code></td>
+<td><code>octomap_msgs/Octomap</code></td>
+<td>建图节点以 latched 方式发布，晚连上的订阅者也能立刻收到</td>
+</tr>
+<tr>
+<td>目标点</td>
+<td><code>/uav/goal</code></td>
+<td><code>geometry_msgs/Point</code></td>
+<td>世界系 ENU。规划器与控制器都订阅它</td>
+</tr>
+<tr>
+<td>路径</td>
+<td><code>/uav/path</code></td>
+<td><code>nav_msgs/Path</code></td>
+<td>原始折线（A* 输出），latched</td>
+</tr>
+<tr>
+<td>平滑路径</td>
+<td><code>/uav/path_smooth</code></td>
+<td><code>nav_msgs/Path</code></td>
+<td>平滑后的路径，latched；与上面并存便于对比</td>
+</tr>
+<tr>
+<td>展开节点</td>
+<td><code>/uav/explored_markers</code></td>
+<td><code>visualization_msgs/MarkerArray</code></td>
+<td>按节点尺寸着色，用于观察跨分辨率行为</td>
+</tr>
+</tbody>
+</table>
+<p>坐标系：TF 链是 <code>world → base_link → lidar_link</code>；<code>world</code> 为 ENU，桥接节点负责 NED↔ENU 转换。</p>
+<h3 id="14">1.4 发布一次目标点</h3>
+<div class="highlight"><pre><span></span><code>rostopic<span class="w"> </span>pub<span class="w"> </span>-1<span class="w"> </span>/uav/goal<span class="w"> </span>geometry_msgs/Point<span class="w"> </span><span class="s2">"{x: 8.0, y: 8.0, z: 2.0}"</span>
+</code></pre></div>
+<p>该话题被两个节点订阅：<code>astar_planner</code> 收到后规划一条路径，<code>airsim_bridge</code> 收到后让载具飞过去。
+若只想看规划结果而不希望载具移动，用 <code>bridge:=false</code> 启动：</p>
+<div class="highlight"><pre><span></span><code>roslaunch<span class="w"> </span>octree_uav_3d_pathfinding<span class="w"> </span>main.launch<span class="w"> </span>bridge:<span class="o">=</span><span class="nb">false</span>
+</code></pre></div>
+<hr/>
+<h2 id="2">2. 为什么需要这一节</h2>
+<p>A* 输出的路径是<strong>八叉树叶节点中心的序列</strong>，直接拿它去飞有两个问题：</p>
+<table>
+<thead>
+<tr>
+<th>问题</th>
+<th>具体表现</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>没有安全裕度</strong></td>
+<td>路径航点落在自由叶的<strong>中心</strong>上，代价是"两节点中心的距离"，所以路径可以贴近障碍物。它只是没有撞上，没有留余量</td>
+</tr>
+<tr>
+<td><strong>是折线，且航点疏密不均</strong></td>
+<td>空旷处一步跨过十几米，障碍附近一步 0.3 m。折线拐角处的曲率为无穷大，控制器无法跟踪；同时有大量共线的冗余航点</td>
+</tr>
+</tbody>
+</table>
+<p>本节做两件事来对应这两个问题：<strong>安全裕度</strong>（膨胀 + 代价惩罚）与<strong>路径平滑</strong>（捷径化 + 三次样条）。</p>
+<hr/>
+<h2 id="3">3. 关键认识：两种安全裕度不是平级的</h2>
+<p>一个容易想当然的做法是把"地图膨胀"和"代价惩罚"当作两个并列的手段，任选其一。
+实际它们是"硬约束"与"软偏好"的关系，本节的设计都建立在这个区分上。</p>
+<p>回到 A* 的代价函数：</p>
+<p>
+<script type="math/tex; mode=display">
+\mathrm{cost}(n, n_b) = \lVert \boldsymbol{c}_{n_b} - \boldsymbol{c}_n \rVert_2
+</script>
+</p>
+<p>路径航点是自由叶的中心，于是：</p>
+<table>
+<thead>
+<tr>
+<th>只做代价惩罚</th>
+<th>只做地图膨胀</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>不产生硬保证。惩罚只让贴近障碍的边变贵，A* 在别无选择时仍会贴过去——惩罚大只是"不划算"，不是"不允许"</td>
+<td>让<strong>膨胀占用</strong>成为不可通行，路径中心到<strong>真障碍</strong>的距离有了下界 <script type="math/tex">r</script>。这是硬保证</td>
+</tr>
+</tbody>
+</table>
+<p><strong>结论：</strong></p>
+<p>
+<script type="math/tex; mode=display">
+\text{膨胀} \;\to\; \text{硬约束}, \qquad
+\text{惩罚} \;\to\; \text{软偏好}
+</script>
+</p>
+<p>惩罚要消费膨胀算出的间隙，两者共用同一份信息，而不是各算一套距离。实现上对应
+<code>MapInflation</code>（产出）+ <code>clearance penalty</code>（消费）两个组件，而不是两个平级开关。</p>
+<hr/>
+<h2 id="4">4. 安全裕度（一）：地图膨胀 —— 硬约束</h2>
+<h3 id="41">4.1 影子树</h3>
+<p>把原树里每个<strong>占用叶节点</strong>沿轴向外扩 <script type="math/tex">r</script>，把外扩盒内的体素全部标进一棵
+<strong>影子树</strong>：</p>
+<div class="highlight"><pre><span></span><code>for 每个占用叶（中心 c、半边长 h）:
+    盒子 = [c − h − r, c + h + r]
+    把盒内的体素逐个标进影子树
+</code></pre></div>
+<p>于是"是否可通行"多了一道硬判定：</p>
+<div class="highlight"><pre><span></span><code><span class="kt">bool</span><span class="w"> </span><span class="nf">isBlocked</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">point3d</span><span class="o">&amp;</span><span class="w"> </span><span class="n">p</span><span class="p">);</span><span class="w">   </span><span class="c1">// true = 落在安全裕度内，不可通行</span>
+</code></pre></div>
+<p><strong>为什么用影子树而不是直接改原树</strong>：</p>
+<ul>
+<li>原树仍用于发 <code>/octomap_full</code> 和 RViz 可视化，前后占用体素一致</li>
+<li>膨胀的信息是新增的，不改建图结果</li>
+<li>
+<script type="math/tex">r = 0</script> 时影子树为空、<code>isBlocked()</code> 恒为 <code>false</code>，整套代码退回上一节的行为
+  （这是回归测试的锚点，见 §7）</li>
+</ul>
+<h3 id="42">4.2 膨胀必须"按键枚举"，不能自己算坐标</h3>
+<p>这里有一处容易出错的地方。octomap 的体素中心落在</p>
+<p>
+<script type="math/tex; mode=display">
+\text{center}(k) = (k + 0.5)\cdot \text{resolution}
+</script>
+</p>
+<p>这组格点上。如果按"盒下界 + 半个体素"生成中心：</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// 错误做法：与键格错开半个体素</span>
+<span class="k">const</span><span class="w"> </span><span class="n">point3d</span><span class="w"> </span><span class="nf">q</span><span class="p">(</span><span class="n">lo</span><span class="p">.</span><span class="n">x</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">0.5</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">res</span><span class="p">,</span><span class="w"> </span><span class="p">...);</span>
+</code></pre></div>
+<p>得到的格点与键格<strong>错开半个体素</strong>，"写入影子树的体素"与"判定时命中的体素"
+不是同一批。症状是<strong>被膨胀的体素中心自己判不出阻塞</strong>（实测间隙 0.45 m，期望 0.6 m）。</p>
+<p><strong>正确做法是按整数键枚举</strong>：</p>
+<div class="highlight"><pre><span></span><code><span class="n">OcTreeKey</span><span class="w"> </span><span class="n">lo_key</span><span class="p">,</span><span class="w"> </span><span class="n">hi_key</span><span class="p">;</span>
+<span class="n">tree</span><span class="p">.</span><span class="n">coordToKeyChecked</span><span class="p">(</span><span class="n">lo</span><span class="p">,</span><span class="w"> </span><span class="n">lo_key</span><span class="p">);</span><span class="w">      </span><span class="c1">// 先把盒的坐标范围落到键上</span>
+<span class="n">tree</span><span class="p">.</span><span class="n">coordToKeyChecked</span><span class="p">(</span><span class="n">hi</span><span class="p">,</span><span class="w"> </span><span class="n">hi_key</span><span class="p">);</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">long</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lo_key</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">hi_key</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span><span class="w"> </span><span class="o">++</span><span class="n">i</span><span class="p">)</span><span class="w">      </span><span class="c1">// 按整数键枚举</span>
+<span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">long</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lo_key</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">hi_key</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span><span class="w"> </span><span class="o">++</span><span class="n">j</span><span class="p">)</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">long</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lo_key</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">hi_key</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span><span class="w"> </span><span class="o">++</span><span class="n">k</span><span class="p">)</span>
+<span class="w">      </span><span class="n">tree</span><span class="p">.</span><span class="n">updateNode</span><span class="p">(</span><span class="n">OcTreeKey</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="p">),</span><span class="w"> </span><span class="nb">true</span><span class="p">);</span><span class="w">        </span><span class="c1">// 插入与判定走同一条路径</span>
+</code></pre></div>
+<p>这样"插入的位置"与"判定时命中的位置"逐格一致。</p>
+<h3 id="43-r">4.3 <script type="math/tex">r</script> 取多大：安全性与可通过性的取舍</h3>
+<p>膨胀会不可逆地损失可通过空间：原来能走的窄缝，膨胀后可能消失。
+所以 <script type="math/tex">r</script> 的选择是一个取舍：</p>
+<table>
+<thead>
+<tr>
+<th>
+<script type="math/tex">r</script>
+</th>
+<th>效果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<script type="math/tex">0</script>
+</td>
+<td>关闭膨胀，退回上一节行为（回归基线）</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">0.6\,\mathrm{m}</script>
+</td>
+<td>推荐值（2 个体素）：路径中心到真障碍至少留 0.6 m</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">1.0\,\mathrm{m}</script>
+</td>
+<td>更保守，窄通道可能被堵死，表现为"基线有解、加膨胀后无解"</td>
+</tr>
+</tbody>
+</table>
+<p><strong>"加膨胀后无解"是预期行为，不是缺陷</strong>，它是安全裕度的代价。
+实测的膨胀规模见 §7。</p>
+<hr/>
+<h2 id="5">5. 安全裕度（二）：间隙惩罚 —— 软偏好</h2>
+<p>在膨胀给出硬下界之后，再用代价函数把路径<strong>从障碍旁边推开一点</strong>：</p>
+<p>
+<script type="math/tex; mode=display">
+\mathrm{cost}(n, n_b) = \lVert \boldsymbol{c}_{n_b} - \boldsymbol{c}_n \rVert_2
+\cdot \left(1 + w \cdot \exp\!\left(-\frac{d(n_b)}{r_{\text{soft}}}\right)\right)
+</script>
+</p>
+<p>其中 <script type="math/tex">d(n_b)</script> 是节点 <script type="math/tex">n_b</script> 到<strong>膨胀边界</strong>的间隙（m），由膨胀层提供。</p>
+<ul>
+<li>
+<script type="math/tex">w = 0</script>：代价等于上一节 —— 又一个回归锚点</li>
+<li>
+<script type="math/tex">w > 0</script>：离障碍越近的边越贵，A* 倾向于走有余量的通道</li>
+</ul>
+<p><strong>关于最优性</strong>：惩罚只让 <script type="math/tex">g</script> 变大，所以启发函数仍可采纳
+（<script type="math/tex">w = 0</script> 时保证最优）。但 <script type="math/tex">w > 0</script> 时<strong>目标函数被重新定义</strong>，
+得到的是"新代价下的最优"，不是原目标下的次优解。</p>
+<p><strong>间隙 <script type="math/tex">d</script> 的算法是近似</strong>：从节点中心沿 6 个轴向按步长探测，数到第一次
+命中膨胀占用为止，并按 <code>max_range</code> 截断。它代价低，对软偏好足够，
+但不是精确的欧氏距离（真实最近点可能在对角方向）。</p>
+<hr/>
+<h2 id="6">6. 路径平滑</h2>
+<p>两步，<strong>顺序不能反</strong>。</p>
+<h3 id="61-shortcut">6.1 第一步：捷径化（shortcut）</h3>
+<p>贪心地把折线取直：</p>
+<div class="highlight"><pre><span></span><code>for i in 0..n-1:
+    for j from n-1 down to i+2:        # 从最远的候选试起，取直收益最大
+        if 线段 p[i]→p[j] 无碰撞:
+            保留 p[j]，丢掉 p[i+1..j-1]; break
+</code></pre></div>
+<p><strong>三个要点</strong>：</p>
+<ol>
+<li><strong>碰撞检测用的是规划器自己的可通行谓词</strong>，它包含两层判定：
+   <strong>先查原树的占用与未知</strong>（未知一律当障碍），<strong>再叠加膨胀阻塞</strong>。
+   所以平滑也受安全裕度约束，不会把路径拉回障碍旁；规划与平滑共用同一套安全语义。
+   这两层都必须有 —— 少了原树那一层，<code>inflation_radius = 0</code> 时谓词会退化成
+   "任何位置都可行"，捷径化就会把路径直接取直、穿过障碍（§7 有用例覆盖）。</li>
+<li><strong>采样步长必须小于分辨率</strong>（默认 <script type="math/tex">\text{resolution}/2</script>）。
+   否则线段会从两个占用体素的对角缝里穿过去。这是安全关键项，
+   不是可以调大的性能参数（§7 有一条反例断言证明这一点）。
+   因此 <code>smoothPath</code> <strong>强制</strong> <script type="math/tex">0 < \text{step} < \text{resolution}</script>：
+   显式传入的值只要 ≥ 分辨率，就被限幅到 <script type="math/tex">\text{resolution}/2</script>，
+   并在 <code>SmoothStats</code> 里标记、由节点打 WARN —— <strong>不静默改参数，也不放行</strong>。</li>
+<li><strong>首尾两点保留</strong>：它们是任务给定的起点与终点。</li>
+</ol>
+<h3 id="62">6.2 第二步：三次样条</h3>
+<p>在捷径化后的折线上做<strong>自然三次样条插值</strong>（曲线<strong>过</strong>航点）：</p>
+<ul>
+<li>按累积弦长参数化</li>
+<li>对三个坐标分量分别解一次<strong>三对角方程组</strong>（Thomas 算法），自然边界条件</li>
+<li>逐段采样输出</li>
+</ul>
+<p>不需要引入 Eigen 或第三方样条库。</p>
+<h3 id="63">6.3 拟合与逼近的取舍</h3>
+<table>
+<thead>
+<tr>
+<th>路线</th>
+<th>做法</th>
+<th>优点</th>
+<th>缺点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>拟合</strong></td>
+<td>曲线<strong>过</strong>航点</td>
+<td>贴合原折线</td>
+<td>在拐角内侧向外偏离，可能侵入障碍</td>
+</tr>
+<tr>
+<td>逼近</td>
+<td>航点当<strong>控制点</strong></td>
+<td>曲线在控制点凸包内，更平滑</td>
+<td>不过航点，会切角</td>
+</tr>
+</tbody>
+</table>
+<p>本实现选<strong>拟合 + 复检 + 不过就退回折线</strong>。第一优先级是不引入碰撞，
+平滑度在其次。平滑是增强，不能变成引入碰撞。</p>
+<p><strong>复检</strong>：样条按 <script type="math/tex">\text{res}/2</script> 重采样，逐点<strong>且逐段</strong>检查；只要有一点越界，
+就整条丢掉、退回捷径化折线，并在日志里说明"被复检拒绝"。</p>
+<h3 id="64">6.4 曲率计算与除零守卫</h3>
+<p>平滑后的路径要能衡量"有多光滑"，用<strong>三点外接圆</strong>公式：</p>
+<p>
+<script type="math/tex; mode=display">
+\kappa = \frac{2\,\lVert (\boldsymbol{p}_1 - \boldsymbol{p}_0) \times (\boldsymbol{p}_2 - \boldsymbol{p}_1) \rVert}
+{\lVert \boldsymbol{p}_1 - \boldsymbol{p}_0 \rVert \cdot \lVert \boldsymbol{p}_2 - \boldsymbol{p}_1 \rVert \cdot \lVert \boldsymbol{p}_2 - \boldsymbol{p}_0 \rVert}
+</script>
+</p>
+<p><strong>分母是三条边长的乘积</strong>，共线、重复点、零长时都会逼近 0。守卫策略：</p>
+<ul>
+<li>任一邻边长度 <script type="math/tex">< \varepsilon</script> → <script type="math/tex">\kappa = 0</script>
+</li>
+<li>叉积模长 <script type="math/tex">< \varepsilon</script> → <script type="math/tex">\kappa = 0</script>（三点共线）</li>
+<li>命中守卫时计数上报，不返回 NaN/inf</li>
+</ul>
+<hr/>
+<h2 id="7">7. 验证</h2>
+<h3 id="71">7.1 离线单元测试</h3>
+<p><code>tests/test_smoothing.cpp</code>，只依赖 octomap 与 STL，不需要 ROS 与模拟器。
+实测 <strong>72 项检查全部通过</strong>。</p>
+<table>
+<thead>
+<tr>
+<th>用例</th>
+<th>验证内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>回归：<script type="math/tex">r = 0</script></strong></td>
+<td><code>isBlocked()</code> 恒 false、间隙饱和、出界点行为与基线一致</td>
+</tr>
+<tr>
+<td><strong>可通行谓词（<script type="math/tex">r = 0</script> + 平滑）</strong></td>
+<td>占用点不可通行、已知空闲点可通行、未知点当障碍；两端点均为已知空闲时，捷径化不得跨过中间的障碍</td>
+</tr>
+<tr>
+<td>捷径化：穿墙</td>
+<td>给一条绕过墙的折线，取直会穿墙，必须拒绝</td>
+</tr>
+<tr>
+<td>捷径化：采样步长</td>
+<td><strong>反例断言</strong>：步长 1.0 m（&gt; 墙厚 0.2 m）会钻过墙，证明步长是安全关键项</td>
+</tr>
+<tr>
+<td>采样步长：限幅</td>
+<td>显式传入 1.0 m（≥ 分辨率 0.3）被压到 0.15；默认路径不触发；<strong>恰好等于分辨率也拦</strong></td>
+</tr>
+<tr>
+<td>曲率守卫</td>
+<td>共线 / 重复点 → <script type="math/tex">\kappa = 0</script> 且不产生 NaN/inf；单位圆三点 → <script type="math/tex">\kappa = 1.0</script>
+</td>
+</tr>
+<tr>
+<td>样条</td>
+<td>无障碍时被采纳、加密路径、过两端点；发布路径的点与线段全部无碰撞</td>
+</tr>
+<tr>
+<td>膨胀：<script type="math/tex">r = 0</script>
+</td>
+<td>不建影子树、<code>isBlocked</code> 恒 false</td>
+</tr>
+<tr>
+<td>膨胀：<script type="math/tex">r = 0.6</script>
+</td>
+<td>体素中心自己被阻塞、0.5 m 内阻塞、1.5 m 外空闲</td>
+</tr>
+<tr>
+<td>膨胀：规模</td>
+<td>见下表</td>
+</tr>
+<tr>
+<td>膨胀：只增不改</td>
+<td>原树的占用叶数与节点数不变</td>
+</tr>
+</tbody>
+</table>
+<h3 id="72">7.2 膨胀规模实测（风险项：膨胀后树规模）</h3>
+<p>一面 <script type="math/tex">6\times 6\,\mathrm{m}</script> 的薄墙（面状分布，接近真实地图的形态）：</p>
+<table>
+<thead>
+<tr>
+<th>
+<script type="math/tex">r</script>
+</th>
+<th>影子树叶数</th>
+<th>写入体素数</th>
+<th>影子树内存</th>
+<th>相对原树内存</th>
+<th>构建耗时</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0.3 m</td>
+<td>1667</td>
+<td>17424</td>
+<td>0.0748 MB</td>
+<td>×3.54</td>
+<td>7.3 ms</td>
+</tr>
+<tr>
+<td>0.6 m</td>
+<td>2278</td>
+<td>57624</td>
+<td>0.0846 MB</td>
+<td>×4.00</td>
+<td>16.7 ms</td>
+</tr>
+<tr>
+<td>1.0 m</td>
+<td>1955</td>
+<td>186624</td>
+<td>0.0793 MB</td>
+<td>×3.75</td>
+<td>42.6 ms</td>
+</tr>
+</tbody>
+</table>
+<p>体素数随 <script type="math/tex">r</script> 单调增长，但叶数不单调（<script type="math/tex">r = 1.0</script> 的叶数少于 <script type="math/tex">r = 0.6</script>）。
+原因是影子树按八叉树规则剪枝：<script type="math/tex">r = 1.0</script> 的外扩盒边界与 0.3 m 分辨率的层级对得更齐，
+更容易合并成大节点。所以测试断言"体素数单调"，而不是"叶数单调"。</p>
+<h3 id="73">7.3 路径指标对比（离线端到端实测）</h3>
+<p>实验平台：<code>scripts/mock_cloud_publisher.py</code> 造的离线场景 —— 房间 <script type="math/tex">20\times20\times6\,\mathrm{m}</script>，
+内有 5 个从地面顶到天花板的障碍（两道错开的墙把空间切成走廊，外加三根柱子）。
+传感器在房间四角依次驻留 10 秒填满地图，之后停在最后一个驻留点。
+规划起点为传感器最终位置，目标点取其对角 <script type="math/tex">(7.5, -7.5, 0)</script>，三组使用同一条目标点。</p>
+<p>三组参数对照（每组重启规划节点 —— 参数只在节点启动时读取）：</p>
+<table>
+<thead>
+<tr>
+<th>配置</th>
+<th>膨胀半径 <script type="math/tex">r</script>
+</th>
+<th>平滑</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>基线</td>
+<td>0（关闭）</td>
+<td>关闭</td>
+</tr>
+<tr>
+<td>+膨胀</td>
+<td>0.6 m</td>
+<td>关闭</td>
+</tr>
+<tr>
+<td>+膨胀+平滑</td>
+<td>0.6 m</td>
+<td>开启（捷径化 + 样条）</td>
+</tr>
+</tbody>
+</table>
+<p>结果：</p>
+<table>
+<thead>
+<tr>
+<th>指标</th>
+<th>基线</th>
+<th>+膨胀</th>
+<th>+膨胀+平滑</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>扩展节点数</td>
+<td>4915</td>
+<td><strong>775</strong></td>
+<td>721</td>
+</tr>
+<tr>
+<td>路径航点数</td>
+<td>40</td>
+<td>23</td>
+<td><strong>10</strong></td>
+</tr>
+<tr>
+<td>路径长度</td>
+<td>29.71 m</td>
+<td>27.53 m</td>
+<td>36.46 m</td>
+</tr>
+<tr>
+<td>最大曲率</td>
+<td>2.1082 1/m</td>
+<td>1.6667 1/m</td>
+<td><strong>0.7018 1/m</strong></td>
+</tr>
+<tr>
+<td><strong>到障碍的最小间隙</strong></td>
+<td><strong>0.15 m</strong></td>
+<td><strong>0.75 m</strong></td>
+<td><strong>1.20 m</strong></td>
+</tr>
+<tr>
+<td>规划耗时</td>
+<td>82.3 ms</td>
+<td>14.1 ms</td>
+<td>13.1 ms</td>
+</tr>
+</tbody>
+</table>
+<p><strong>膨胀的作用</strong>（基线 → +膨胀）：</p>
+<ul>
+<li>最小间隙 <script type="math/tex">0.15 \to 0.75\,\mathrm{m}</script>，抬到安全半径 <script type="math/tex">r = 0.6\,\mathrm{m}</script> 之上 —— 硬约束的直接效果</li>
+<li>扩展节点数 <script type="math/tex">4915 \to 775</script>（−84%）：大量自由叶落进膨胀带后不再可通行，搜索空间变小</li>
+<li>规划耗时 <script type="math/tex">82.3 \to 14.1\,\mathrm{ms}</script>，与搜索空间缩小一致</li>
+<li>膨胀本身的开销是一次性的：<code>inflated voxels=3212130</code>、<code>shadow leaves=20023</code>、
+  <code>nodes=261154</code>、内存 0.77 MB、建树 613 ms（建图后做一次，不随规划次数增长）</li>
+</ul>
+<p><strong>平滑的作用</strong>（+膨胀 → +膨胀+平滑）：</p>
+<ul>
+<li>航点数 <script type="math/tex">23 \to 10</script>，最大曲率 <script type="math/tex">2.1082 \to 0.7018\,\mathrm{1/m}</script>（−67%）</li>
+<li>最小间隙 <script type="math/tex">0.75 \to 1.20\,\mathrm{m}</script>，没有变差</li>
+</ul>
+<p><strong>该场景下样条被复检拒绝</strong>：</p>
+<div class="highlight"><pre><span></span><code>P5 smooth pipeline: 43 -&gt; 10 pts | shortcut applied (0.5 ms)
+                                 | spline not applied [REJECTED by recheck]
+note: spline rejected by collision recheck; fell back to shortcut polyline
+</code></pre></div>
+<p>上表第三列因此是<strong>捷径化折线</strong>的指标，不含样条。原因与 §6.3 写的一致：样条是<strong>拟合</strong>
+（必须穿过每个航点），捷径化后只剩 10 个航点，而拐角航点恰好贴在安全边界上
+（最小间隙 0.75 m 即来自该点）；样条在拐角内侧会向外偏，于是侵入膨胀区。
+复检此时按设计整条丢弃样条、退回折线 —— <strong>安全性优先于平滑度</strong>。</p>
+<p>也就是说：平坦通道上的冗余航点被捷径化去掉了，而剩下的拐角样条过不去 ——
+后者是<strong>拟合路线的固有代价</strong>，不是实现缺陷。改进方向见 §7.4。</p>
+<p><strong>关于两组数据的可比性</strong>：传感器是巡游的，发目标点的时刻不同，起点会落在不同的自由叶里
+（基线为 <code>(-7.50, 7.50)</code>，后两组为 <code>(-8.40, 8.40)</code>）。所以<strong>长度一列不宜横向比较</strong>；
+其余指标（最小间隙、曲率、航点数、扩展数）反映各自路径的形态，不受影响。</p>
+<p>三组在同一场景、同一目标点下的 RViz 对比（离线验证场景，与上一节的图同源）：</p>
+<p><img alt="基线（r=0，无平滑）的路径" src="../../../img/air/octree_uav_3d_pathfinding/p5_baseline_rviz.png"/></p>
+<p>基线组的路径贴着障碍与未知区走，最小间隙 0.15 m。</p>
+<p><img alt="+膨胀（r=0.6 m）的路径" src="../../../img/air/octree_uav_3d_pathfinding/p5_inflate_rviz.png"/></p>
+<p>膨胀后路径离障碍明显更远，最小间隙 0.75 m。</p>
+<p><img alt="+膨胀+平滑的路径" src="../../../img/air/octree_uav_3d_pathfinding/p5_smooth_rviz.png"/></p>
+<p>绿色是原始路径（43 点），青色是平滑后路径（10 点捷径折线）。该场景下样条被复检拒绝。</p>
+<h3 id="74">7.4 进一步工作</h3>
+<p>本节实测暴露的两点，按性价比排序：</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>项</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>拐角处保留航点再拟合</strong></td>
+<td>让样条不要在拐角被迫大幅弯曲，从而通过复检。这是让"拟合"路线真正可用的关键</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>改用逼近（B 样条）</strong></td>
+<td>航点当控制点，曲线落在控制点凸包内，不穿过拐角 —— 从根上避免"拐角外偏"（见 §6.3）</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>最小捕捉的平滑</strong></td>
+<td>把平滑写成一个带约束的优化（目标是最小化曲率或加加速度，约束是全程离障碍 ≥ 安全半径），比"先折线再拟合"更彻底。代价是需要引入二次规划求解器</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>指标的精确化</strong></td>
+<td>目前的最小间隙沿 6 个轴向步进探测（偏乐观）。精确做法是对每个路径点做 26 邻域欧氏距离变换，代价高得多</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="8">8. 参数</h2>
+<p><code>config/params.yaml</code> 的 <code>astar_planner</code> 组（默认值都设成"等价于上一节"）：</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>默认</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>inflation_radius</code></td>
+<td><code>0.0</code></td>
+<td>安全裕度半径（m）。0 = 关闭膨胀，行为等于上一节</td>
+</tr>
+<tr>
+<td><code>inflation_resolution</code></td>
+<td><code>0.0</code></td>
+<td>影子树分辨率；0 = 与原树一致（推荐）</td>
+</tr>
+<tr>
+<td><code>clearance_penalty_weight</code></td>
+<td><code>0.0</code></td>
+<td>间隙惩罚权重 <script type="math/tex">w</script>。0 = 关闭惩罚</td>
+</tr>
+<tr>
+<td><code>clearance_penalty_scale</code></td>
+<td><code>0.0</code></td>
+<td>惩罚衰减尺度 <script type="math/tex">r_{\text{soft}}</script>；0 = 取 <code>inflation_radius</code></td>
+</tr>
+<tr>
+<td><code>smoothing</code></td>
+<td><code>false</code></td>
+<td>路径平滑总开关（默认关）</td>
+</tr>
+<tr>
+<td><code>smoothing_shortcut</code></td>
+<td><code>true</code></td>
+<td>是否做捷径化</td>
+</tr>
+<tr>
+<td><code>smoothing_spline</code></td>
+<td><code>true</code></td>
+<td>是否做三次样条</td>
+</tr>
+<tr>
+<td><code>smoothing_sample_step</code></td>
+<td><code>0.0</code></td>
+<td>碰撞检测步长；0 = <code>resolution/2</code>。<strong>≥ 分辨率会被强制限幅到 <code>resolution/2</code> 并打 WARN</strong>（见 §6.1）</td>
+</tr>
+<tr>
+<td><code>smoothing_samples_per_segment</code></td>
+<td><code>8</code></td>
+<td>样条每段采样点数</td>
+</tr>
+<tr>
+<td><code>smooth_path_topic</code></td>
+<td><code>/uav/path_smooth</code></td>
+<td>平滑后路径话题，与 <code>/uav/path</code> 并存便于对比</td>
+</tr>
+<tr>
+<td><code>metrics_log</code></td>
+<td><code>true</code></td>
+<td>打印路径长度 / 最大曲率 / 最小间隙 / 三段耗时</td>
+</tr>
+<tr>
+<td><code>clearance_probe_range</code></td>
+<td><code>2.0</code></td>
+<td>最小间隙指标的探测上限（m）</td>
+</tr>
+</tbody>
+</table>
+<p>默认值全部"等价于上一节"的原因：</p>
+<ol>
+<li>上一节的验收场景可以原样重跑做回归；</li>
+<li>打开开关即可对比；</li>
+<li>避免合入后改变原有行为。</li>
+</ol>
+<p>输出话题：</p>
+<table>
+<thead>
+<tr>
+<th>话题</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/uav/path</code></td>
+<td><code>nav_msgs/Path</code></td>
+<td>原始折线（上一节的口径，不变）</td>
+</tr>
+<tr>
+<td><code>/uav/path_smooth</code></td>
+<td><code>nav_msgs/Path</code></td>
+<td>平滑后的路径，与上面并存便于 RViz 对比</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="9">9. 实现中踩到的坑（供参考）</h2>
+<h3 id="91">9.1 判定"是否被占用"不能用"子节点槽位是否为空"</h3>
+<p>这个判据造成过两个看起来无关的现象。</p>
+<p>octomap 在合并/剪枝时会把连片的空闲兄弟删掉，把占用状态留在父节点上。
+所以下面这种自己写的下潜判据是错的：</p>
+<div class="highlight"><pre><span></span><code><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">nodeHasChildren</span><span class="p">(</span><span class="n">n</span><span class="p">))</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span><span class="w">        </span><span class="c1">// 错：当作"到底了，未被标占用"</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">nodeChildExists</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">idx</span><span class="p">))</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span><span class="w">   </span><span class="c1">// 错：当作"该分支未分配"</span>
+</code></pre></div>
+<p>它不能推出"该处未被标占用"。症状有两种：</p>
+<ul>
+<li>膨胀层：被膨胀的体素中心自己判不出阻塞，测出的间隙偏小</li>
+<li>上一节的常驻自检：<code>findLeaf self-check: 2000 个自由叶里 172 个查不回来</code></li>
+</ul>
+<p><strong>解法</strong>：在<strong>影子树</strong>里直接用 octomap 自己的 <code>search()</code>。
+影子树是逐个底层键插进去的，没有粗自由节点，
+所以不存在"<code>search()</code> 遇到剪枝节点返回 NULL"的问题。</p>
+<blockquote>
+<p>这不能照搬到主地图：上一节绕开 <code>search()</code> 的理由是成立的——
+剪枝后的粗空闲节点会让 <code>search()</code> 返回 NULL，而 A* 的路径要走这些大节点。
+主地图的叶子查找需要两者结合。</p>
+</blockquote>
+<h3 id="92-key-key">9.2 八叉树遍历器的 key 与"叶子所在层的 key"不是同一个东西</h3>
+<p><code>selfCheckLookup</code> 长期误报 <code>172/2000</code>，一度被当成"叶子查找有 bug"。
+实际是<strong>自检的比较基准错了</strong>：它把遍历器报告的原生 key 直接和
+"折算到叶子所在层的 key"相比，而遍历器的原生 key 把"该叶在父节点中的位置"留在低位。</p>
+<p>实测的对应关系（树深 16）：</p>
+<table>
+<thead>
+<tr>
+<th>叶子深度</th>
+<th>遍历器原生 key</th>
+<th>折算后</th>
+<th>右移位数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>13</td>
+<td>32772</td>
+<td>4096</td>
+<td>3 = 16 − 13</td>
+</tr>
+<tr>
+<td>15</td>
+<td>32777</td>
+<td>16388</td>
+<td>1 = 16 − 15</td>
+</tr>
+</tbody>
+</table>
+<p><strong>修法</strong>：比较前把遍历器 key 也右移 <code>(树深 − 叶子深度)</code> 位。
+改完后，两种测试地图共 <strong>1519 个自由叶全部命中</strong>（<code>KEY-DIFF = 0</code>）。</p>
+<p><strong>结论</strong>：自检报"大量失配、但功能看起来正常"时，要先怀疑自检本身。</p>
+<h3 id="93-octomap">9.3 手写 octomap 的编译命令必须同时链两个库</h3>
+<p><code>liboctomath</code> 是<strong>独立</strong>的库。只写 <code>-loctomap</code> 会报：</p>
+<div class="highlight"><pre><span></span><code>undefined reference to `octomath::Pose6D::transform(octomath::Vector3 const&amp;)'
+/opt/ros/noetic/lib/liboctomath.so.1.9: error adding symbols: DSO missing from command line
+</code></pre></div>
+<p>catkin 的 <code>OCTOMAP_LIBRARIES</code> 里两个都带，所以<strong>工程内不会暴露</strong>，
+只有脱离 catkin 手写 <code>g++</code> 时才会踩到。正确写法：</p>
+<div class="highlight"><pre><span></span><code>g++<span class="w"> </span>-std<span class="o">=</span>c++11<span class="w"> </span>-I/opt/ros/noetic/include<span class="w"> </span>foo.cpp<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-L/opt/ros/noetic/lib<span class="w"> </span>-loctomap<span class="w"> </span>-loctomath<span class="w"> </span>-o<span class="w"> </span>foo
+</code></pre></div>
+<hr/>
+<h2 id="10">10. 参考</h2>
+<ul>
+<li><a href="https://octomap.github.io/">OctoMap 官网</a></li>
+<li>de Boor, <em>A Practical Guide to Splines</em>, Springer, 1978（B 样条与三对角求解）</li>
+<li>Mellinger &amp; Kumar, <em>Minimum Snap Trajectory Generation and Control for Quadrotors</em>,
+  ICRA 2011（更高级的平滑路线，本文只讲解、未实现）</li>
+<li><a href="http://docs.ros.org/en/noetic/api/nav_msgs/html/msg/Path.html">nav_msgs/Path 消息定义</a></li>
+<li>模块源码：<code>src/air/octree_uav_3d_pathfinding/</code></li>
+</ul>
+<p>查看实际运行的节点与话题关系（第 1 节的图是静态版本）：</p>
+<div class="highlight"><pre><span></span><code>rosrun<span class="w"> </span>rqt_graph<span class="w"> </span>rqt_graph<span class="w">        </span><span class="c1"># 节点—话题图</span>
+rosrun<span class="w"> </span>rqt_tf_tree<span class="w"> </span>rqt_tf_tree<span class="w">    </span><span class="c1"># TF 树</span>
+rostopic<span class="w"> </span>list<span class="w">                     </span><span class="c1"># 所有话题</span>
+</code></pre></div>
+<hr/>
+<p>本文档及配套模块代码在编写过程中使用了 AI 大模型辅助（方案讨论、代码与文档起草、问题排查）。
+全部内容经过实际运行验证：模块在 Ubuntu 20.04.6 + ROS Noetic 环境下编译通过，
+离线单元测试（<code>test_smoothing</code>，59 项检查）全部通过。
+作者对提交内容的正确性与完整性负全部责任。</p></div>
+</div>
+</div><footer>
+<div aria-label="Footer Navigation" class="rst-footer-buttons" role="navigation">
+<a class="btn btn-neutral float-left" href="../astar_planning/" title="八叉树上的 A* 全局寻路"><span class="icon icon-circle-arrow-left"></span> 前一页</a>
+<a class="btn btn-neutral float-right" href="../../openhutb_yolo_mlp_control/" title="YOLO目标检测与八字轨迹控制">后一页 <span class="icon icon-circle-arrow-right"></span></a>
+</div>
+<hr>
+<div role="contentinfo">
+<!-- Copyright etc -->
+<p>OpenHUTB 版权所有 © 2026</p>
+</div>
+</hr></footer>
+</div>
+</div>
+</section>
+</div>
+<div aria-label="Versions" class="rst-versions" role="note">
+<span class="rst-current-version" data-toggle="rst-current-version">
+<span>
+<a href="https://github.com/OpenHUTB/ros2" style="color: #fcfcfc">OpenHUTB</a>
+</span>
+<span><a href="../astar_planning/" style="color: #fcfcfc">« 前一页</a></span>
+<span><a href="../../openhutb_yolo_mlp_control/" style="color: #fcfcfc">后一页 »</a></span>
+</span>
+</div>
+<script src="../../../js/jquery-3.6.0.min.js"></script>
+<script>var base_url = "../../..";</script>
+<script src="../../../js/theme_extra.js"></script>
+<script src="../../../js/theme.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.2.7/raphael.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-sequence-diagrams/1.0.6/sequence-diagram-min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/flowchart/1.6.5/flowchart.min.js"></script>
+<script src="../../../js/umlconvert.js"></script>
+<script src="../../../search/main.js"></script>
+<script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+<script>mermaid.initialize({});</script></body>
+</html>

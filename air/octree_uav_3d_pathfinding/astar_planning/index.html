@@ -55,13 +55,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../chapter/chap4/">4. 机器人仿真</a>
 </li>
-<li class="toctree-l1"><a class="reference internal">5. 机器人感知</a>
-<ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../chapter/chap5/">章节首页</a>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../../../chapter/chap5/lidar_obstacle_nn/">激光雷达 NN 障碍物分类</a>
-</li>
-</ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../chapter/chap5/">5. 机器人感知</a>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../chapter/chap6/">6. 机器人 SLAM 与自主导航</a>
 </li>
@@ -204,6 +198,8 @@
 <li class="toctree-l3"><a class="reference internal" href="#11">11. 参考</a>
 </li>
 </ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../path_smoothing/">安全裕度与路径平滑</a>
 </li>
 </ul>
 </li>
@@ -593,6 +589,20 @@ ROS 节点只是它的一层外壳，负责收发话题、查 TF、把结果转�
 </ul>
 <hr/>
 <h2 id="8">8. 运行方法与效果</h2>
+<h3 id="81">8.1 准备工作空间</h3>
+<p>本模块的功能包是 <code>octree_uav_3d_pathfinding</code>，按 catkin 的规则，它需要位于
+工作空间的 <code>src/</code> 之下。工作空间的建立见<a href="../env_setup/">环境配置与前置准备</a>，
+模块代码的准备有两种方式：</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># 工作空间</span>
+mkdir<span class="w"> </span>-p<span class="w"> </span>~/uav_ws/src<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>~/uav_ws<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>catkin_make<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">source</span><span class="w"> </span>devel/setup.bash
+
+<span class="c1"># 方式一：克隆本仓库，把包软链接进工作空间</span>
+git<span class="w"> </span>clone<span class="w"> </span>https://github.com/OpenHUTB/ros2.git<span class="w"> </span>~/ros2
+ln<span class="w"> </span>-sfn<span class="w"> </span>~/ros2/src/air/octree_uav_3d_pathfinding<span class="w"> </span>~/uav_ws/src/octree_uav_3d_pathfinding
+</code></pre></div>
+<p>若代码已在别处，把 <code>ln</code> 的源路径换成实际路径即可；也可以直接把功能包目录
+拷贝到 <code>~/uav_ws/src/</code> 下。用软链接的好处是仓库更新后不必重新拷贝。</p>
+<h3 id="82">8.2 编译与启动</h3>
 <div class="highlight"><pre><span></span><code><span class="c1"># 编译</span>
 <span class="nb">cd</span><span class="w"> </span>~/uav_ws<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>catkin_make
 <span class="nb">source</span><span class="w"> </span>~/uav_ws/devel/setup.bash
@@ -761,7 +771,7 @@ rostopic<span class="w"> </span>info<span class="w"> </span>/uav/path
 </div><footer>
 <div aria-label="Footer Navigation" class="rst-footer-buttons" role="navigation">
 <a class="btn btn-neutral float-left" href="../occupancy_mapping/" title="点云转八叉树占用地图"><span class="icon icon-circle-arrow-left"></span> 前一页</a>
-<a class="btn btn-neutral float-right" href="../../openhutb_yolo_mlp_control/" title="YOLO目标检测与八字轨迹控制">后一页 <span class="icon icon-circle-arrow-right"></span></a>
+<a class="btn btn-neutral float-right" href="../path_smoothing/" title="安全裕度与路径平滑">后一页 <span class="icon icon-circle-arrow-right"></span></a>
 </div>
 <hr>
 <div role="contentinfo">
@@ -779,7 +789,7 @@ rostopic<span class="w"> </span>info<span class="w"> </span>/uav/path
 <a href="https://github.com/OpenHUTB/ros2" style="color: #fcfcfc">OpenHUTB</a>
 </span>
 <span><a href="../occupancy_mapping/" style="color: #fcfcfc">« 前一页</a></span>
-<span><a href="../../openhutb_yolo_mlp_control/" style="color: #fcfcfc">后一页 »</a></span>
+<span><a href="../path_smoothing/" style="color: #fcfcfc">后一页 »</a></span>
 </span>
 </div>
 <script src="../../../js/jquery-3.6.0.min.js"></script>
