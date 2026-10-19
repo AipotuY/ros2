@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+
+<html class="writer-html5" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="../../img/favicon.ico" rel="shortcut icon"/>
+<title>激光雷达建图与神经网络规划导航 - 模拟器的 ROS 文档</title>
+<link href="../../css/theme.css" rel="stylesheet"/>
+<link href="../../css/theme_extra.css" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" rel="stylesheet"/>
+<link href="../../extra.css" rel="stylesheet"/>
+<script>
+        // Current page data
+        var mkdocs_page_name = "\u6fc0\u5149\u96f7\u8fbe\u5efa\u56fe\u4e0e\u795e\u7ecf\u7f51\u7edc\u89c4\u5212\u5bfc\u822a";
+        var mkdocs_page_input_path = "ground/carla_mapping_navigation.md";
+        var mkdocs_page_url = null;
+      </script>
+<!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+</head>
+<body class="wy-body-for-nav" role="document">
+<div class="wy-grid-for-nav">
+<nav class="wy-nav-side stickynav" data-toggle="wy-nav-shift">
+<div class="wy-side-scroll">
+<div class="wy-side-nav-search">
+<a class="icon icon-home" href="../.."> 模拟器的 ROS 文档
+        </a><div role="search">
+<form action="../../search.html" class="wy-form" id="rtd-search-form" method="get">
+<input aria-label="Search docs" name="q" placeholder="搜索文档" title="Type search term here" type="text"/>
+</form>
+</div>
+</div>
+<div aria-label="Navigation menu" class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation">
+<p class="caption"><span class="caption-text">入门</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../..">首页</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../ubuntu20.04/">安装 ROS</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../chap2/ros2_pubsub_py/">ROS2 话题发布订阅基础实验（talker/listener）</a>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">ROS 教程</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../chapter/chap1/chap1/">1. 认识 ROS</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../chapter/chap2/">2. ROS 基础 - ROS 基础</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../chapter/chap3/">3. 机器人系统设计</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../chapter/chap4/">4. 机器人仿真</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../chapter/chap5/">5. 机器人感知</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../chapter/chap6/">6. 机器人 SLAM 与自主导航</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../chapter/chap7/">7. 阿克曼四轮小车运动控制</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../chapter/chap8/">8. ROS 机器人综合应用</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../chapter/chap9/">9. ROS 2</a>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">人形机器人</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../humanoid/humanoid_basics/">人形机器人基础</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../humanoid/humanoid_keyboard_control/">人形机器人键盘运动控制</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../humanoid/panda_keyboard_control/">键盘操控仿真机械臂</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../humanoid/humanoid_push_recovery/">人形机器人平衡控制与外力抗扰恢复</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../humanoid/humanoid_ppo_locomotion/">人形机器人 PPO 神经网络平衡控制</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../humanoid/humanoid_lidar_nn_perception/">人形机器人 2D 激光雷达 CNN 感知与避障</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../humanoid/mujoco_hopper_demo/">MuJoCo单足弹跳机器人简单仿真</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../waypoint_publisher/">ROS2 Humble 路径点发布器</a>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">肌肉骨骼人</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../musculoskeletal/musculoskeletal_basics/">肌肉骨骼人基础</a>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">地面载具</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../set_up_and_connect_to_carla/">手动控制</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../carla_spawn_objects/">生成对象</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../carla_keyboard_control/">地面载具物理仿真与键盘运动控制</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../ackermann_control/">阿克曼控制</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../carla_perception_control/">传感器感知与给定轨迹跟踪（神经网络版）</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../r2d2_cruise/">R2D2小车 自动巡航</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../waypoint/">路径点发布器</a>
+</li>
+<li class="toctree-l1 current"><a class="reference internal current" href="#">激光雷达建图与神经网络规划导航</a>
+<ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="#1">1. 概述与目标</a>
+<ul>
+<li class="toctree-l3"><a class="reference internal" href="#11">1.1 与已有示例的区别</a>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#12">1.2 与仓库中其它地面载具模块的区分</a>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#2">2. 计算原理</a>
+<ul>
+<li class="toctree-l3"><a class="reference internal" href="#21">2.1 雷达点从传感器坐标系到世界坐标系</a>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#22">2.2 占用栅格：为什么用对数几率</a>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#23">2.3 栅格原点选取（一个必须避开的陷阱）</a>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#24">2.4 规划神经网络</a>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#25">2.5 监督标签</a>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#3">3. 算法流程</a>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#4">4. 源码解析</a>
+<ul>
+<li class="toctree-l3"><a class="reference internal" href="#41-mainpy">4.1 main.py — 主入口（三种模式）</a>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#42-carla_mapping_navigationmapping_navigation_nodepy-ros-2">4.2 carla_mapping_navigation/mapping_navigation_node.py — ROS 2 节点</a>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#43-nn_modelspy-numpy">4.3 nn_models.py — 纯 numpy 神经网络库</a>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#44-carla_commonpy-carla-api">4.4 carla_common.py — CARLA API 封装</a>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#5">5. 仿真运行步骤</a>
+<ul>
+<li class="toctree-l3"><a class="reference internal" href="#51">5.1 支持与测试环境</a>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#52">5.2 新手路线：从已有示例到本模块</a>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#53-0">5.3 步骤 0：环境准备 </a>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#54-1ros-2">5.4 步骤 1：编译本功能包（ROS 2）</a>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#55-2-carla">5.5 步骤 2：离线训练规划神经网络（无需 CARLA） </a>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#56-3-carla">5.6 步骤 3：离线取证（无 CARLA、无图形界面也能跑通建图+导航）</a>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#57-4-carla">5.7 步骤 4：验证与 CARLA 服务端的连接 </a>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#58-5-nn">5.8 步骤 5：运行在线建图 + NN 导航 </a>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#59">5.9 运行效果</a>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#510">5.10 常见问题</a>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#6">6. 性能评价</a>
+<ul>
+<li class="toctree-l3"><a class="reference internal" href="#61">6.1 指标定义</a>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#62">6.2 实测结果（离线取证模式，本机实测）</a>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#63">6.3 调优过程记录</a>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#64">6.4 结论</a>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../ad_agent/">自动驾驶代理</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../ad_demo/">自动驾驶示例</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../rostopic_cruise/">rostopic 手动驱动</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../ros_scenario_runner/">ROS Scenario Runner</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../rviz_plugin/">RVIZ Carla 插件</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../carla_parking_lot/">停车场场景生成</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../yolov8_target_tracking/">YOLOv8 视觉感知目标跟随</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../carla_tsr_ros/">交通标志识别 ROS 封装</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../vehicle_pygame_teleop/">车辆键盘遥操作与二维模拟</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../pcl_recorder/">点云地图创建</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../mujoco_diff_drive_slip_compensation/">MuJoCo 差速小车轮滑感知与轨迹补偿</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../mujoco_car_avoidance/">MuJoCo 地面小车射线感知与分级减速避障</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../car_2d_target_tracker/">2D 小车目标追踪仿真</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../carla_nn_car_following/">神经网络自适应跟车(ACC)</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../weather_perception_benchmark/">恶劣雨雾天气下多传感器感知性能对比实验</a>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">空域载具</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../air/landing_assessment/">无人机着陆阶段识别与接地载荷预测</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../air/payload_mass_estimation/">无人机载荷质量估计</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../air/flight_pattern_recognition/">无人机飞行轨迹类型识别与 ROS2 自动任务日志</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../air/telemetry_diagnostics/">无人机遥测异常检测与 ROS2 在线诊断</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../air/setup_and_connect/">建立虚拟机和空域载具之间的连接</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../air/ros_pkgs/">空域模拟器的 ROS 封装器</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../air/carlair_ros_bridge/">无人机与 ROS 的桥接模块</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../air/rooftop_landing/">无人机屋顶降落</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../air/uav_keyboard_control/">无人机键盘控制</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../air/uav_ppo_nav/">基于 PPO 的无人机导航避障</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../air/uav_rl_benchmark/">强化学习对比实验（PPO/SAC/TD3）</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../air/drone_teleop/">无人机终端键盘遥控器</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../air/drone_ros_teleop/">基于 ROS 消息解耦的无人机键盘遥控</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../air/state_prediction/">基于 GRU 的无人机飞行状态预测与 ROS2 在线误差分析</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../air/uav_mujoco_sim/">MuJoCo 四旋翼仿真与 ROS2 桥接底座</a>
+</li>
+<li class="toctree-l1"><a class="" href="https://openhutb.github.io/air_doc/airsim_tutorial_pkgs/">低空载具的 ROS 示例教程</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../ap_cpp_overfomo/">AP-CPP 主动感知覆盖路径规划</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../air/waypoint_tracking/">无人机航点轨迹跟踪（PID 控制）</a>
+</li>
+<li class="toctree-l1"><a class="reference internal">空域载具八叉树三维寻路</a>
+<ul>
+<li class="toctree-l2"><a class="reference internal" href="../../air/octree_uav_3d_pathfinding/env_setup/">环境配置与前置准备</a>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../air/octree_uav_3d_pathfinding/flight_control/">AirSim 载具与位置控制</a>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../air/octree_uav_3d_pathfinding/occupancy_mapping/">点云转八叉树占用地图</a>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../air/octree_uav_3d_pathfinding/astar_planning/">八叉树上的 A* 全局寻路</a>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../air/octree_uav_3d_pathfinding/path_smoothing/">安全裕度与路径平滑</a>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../air/openhutb_yolo_mlp_control/">YOLO目标检测与八字轨迹控制</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../air/no_fly_zone_check/">禁飞区检测</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../air/allocnet_teleop/">AllocNet 四旋翼避障规划与键盘遥操作</a>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">水域载具</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../water/HoloOcean/">水域载具 ROS2 接口</a>
+</li>
+<li class="toctree-l1"><a class="reference internal">环境搭建</a>
+<ul>
+<li class="toctree-l2"><a class="reference internal" href="../../water/HoloOcean-Windows-Setup/">HoloOcean Windows 本机环境搭建</a>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../water/WSL_HoloOcean2_ROS2/">WSL跑通HoloOcean2的ROS2示例方法</a>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../water/docker/">Docker 开发环境</a>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../water/docker_runtime/">HoloOcean ROS2 运行时容器</a>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../water/holoocean_examples/">水域载具示例</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../water/rov_physical_simulation/">水下机器人物理仿真与 6-DOF 键盘运动控制</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../water/rov_trajectory_tracking/">水下多传感器感知与 3D 轨迹跟踪控制</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../water/rov_sonar_slam_navigation/">水下声呐 SLAM 占据栅格建图与自主避障导航</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../water/mjc_rov_sonar_cnn/">侧扫声呐图像仿真与 CNN 海底目标分类</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../water/mjc_rov_current_teleop/">动态洋流 ROV 键盘遥操与 MLP 巡航控制</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../water/underwater_sonar_mapping/">新增水下三维地形测绘模块</a>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ubuntu2004-local-llm-deploy/">自装ubuntu20.04本地大模型部署教程</a>
+</li>
+</ul>
+</div>
+</div>
+</nav>
+<section class="wy-nav-content-wrap" data-toggle="wy-nav-shift">
+<nav aria-label="Mobile navigation menu" class="wy-nav-top" role="navigation">
+<i class="fa fa-bars" data-toggle="wy-nav-top"></i>
+<a href="../..">模拟器的 ROS 文档</a>
+</nav>
+<div class="wy-nav-content">
+<div class="rst-content"><div aria-label="breadcrumbs navigation" role="navigation">
+<ul class="wy-breadcrumbs">
+<li><a aria-label="Docs" class="icon icon-home" href="../.."></a></li>
+<li class="breadcrumb-item">地面载具</li>
+<li class="breadcrumb-item active">激光雷达建图与神经网络规划导航</li>
+<li class="wy-breadcrumbs-aside">
+<a href="https://github.com/OpenHUTB/ros2/edit/master/docs/ground/carla_mapping_navigation.md"> 编辑页面</a>
+</li>
+</ul>
+<hr/>
+</div>
+<div class="document" itemscope="itemscope" itemtype="http://schema.org/Article" role="main">
+<div class="section" itemprop="articleBody">
+<div><h1 id="carla">CARLA 激光雷达建图与神经网络规划导航</h1>
+<blockquote>
+<p>对应课程作业三：在虚拟环境中实现对机器人的<strong>建图和导航</strong>（导航与 SLAM 同步仿真）。
+满足"<strong>规划算法须为神经网络</strong>"的硬性要求。</p>
+</blockquote>
+<h2 id="1">1. 概述与目标</h2>
+<p>本模块在 <a href="../pcl_recorder/">点云地图创建</a> 与 <a href="../waypoint/">路径点发布器</a> 示例的基础上做拓展，
+把"建图"与"导航"升级为<strong>可在无图形界面环境自证的完整闭环</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>环节</th>
+<th>实现</th>
+<th>神经网络</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>建图</td>
+<td>32 线激光雷达 → 2D 占用栅格（对数几率贝叶斯更新，命中 + 射线沿途空闲）</td>
+<td>否（几何+概率）</td>
+</tr>
+<tr>
+<td>规划</td>
+<td>状态（目标方位 + 障碍左右分布 + 最近距离 + 最近障碍方向角）→ (油门, 转向)</td>
+<td><strong>MLP 策略网络</strong>（5→64→2）</td>
+</tr>
+</tbody>
+</table>
+<p>代码位于 <code>src/ground/carla_mapping_navigation/</code>。</p>
+<h3 id="11">1.1 与已有示例的区别</h3>
+<table>
+<thead>
+<tr>
+<th>对比项</th>
+<th>已有「点云地图创建」（pcl_recorder）</th>
+<th>本拓展模块</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>技术路线</td>
+<td><code>carla_ros_bridge</code> 的 PCL 记录器，保存点云到磁盘</td>
+<td>CARLA Python API 直连 + 自研建图/规划节点</td>
+</tr>
+<tr>
+<td>是否依赖 ros-bridge</td>
+<td>必须编译并运行 ros-bridge</td>
+<td><strong>不需要</strong>，仅需 <code>carla</code> Python 客户端</td>
+</tr>
+<tr>
+<td>地图形式</td>
+<td>3D 点云（<code>.pcd</code> 文件，离线查看）</td>
+<td>2D 占用栅格（<code>nav_msgs/OccupancyGrid</code>，RViz 实时可视化）</td>
+</tr>
+<tr>
+<td>建图时机</td>
+<td>先录后看（离线）</td>
+<td><strong>边动边建图</strong>（SLAM 理念，行驶中实时更新）</td>
+</tr>
+<tr>
+<td>概率更新</td>
+<td>无（纯点云累积）</td>
+<td><strong>贝叶斯对数几率更新</strong>，区分占据/空闲/未知</td>
+</tr>
+<tr>
+<td>导航/规划</td>
+<td><strong>无</strong>（只有建图）</td>
+<td><strong>规划神经网络</strong>输出油门和转向，驶向目标并避障</td>
+</tr>
+<tr>
+<td>无 CARLA / 无图形界面时</td>
+<td>无法运行</td>
+<td><code>--headless --demo</code> 离线自证并导出地图与曲线</td>
+</tr>
+<tr>
+<td>规划算法性质</td>
+<td>—</td>
+<td><strong>神经网络</strong>（纯 numpy 反向传播，可训练）</td>
+</tr>
+</tbody>
+</table>
+<h3 id="12">1.2 与仓库中其它地面载具模块的区分</h3>
+<table>
+<thead>
+<tr>
+<th>模块</th>
+<th>输入</th>
+<th>算法</th>
+<th>是否含神经网络</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>手动控制（<code>set_up_and_connect_to_carla</code>）</td>
+<td>键盘</td>
+<td>复用 ros-bridge 内置逻辑</td>
+<td>否</td>
+</tr>
+<tr>
+<td>路径点发布器（<code>waypoint</code>）</td>
+<td>CARLA 地图</td>
+<td>几何查询、发布路径点</td>
+<td>否</td>
+</tr>
+<tr>
+<td>点云地图创建（<code>pcl_recorder</code>）</td>
+<td>激光雷达</td>
+<td>点云累积存盘</td>
+<td>否</td>
+</tr>
+<tr>
+<td>自动驾驶代理（<code>ad_agent</code>）</td>
+<td>路径点 + 地图</td>
+<td>规则式局部规划</td>
+<td>否</td>
+</tr>
+<tr>
+<td><strong>本模块</strong></td>
+<td><strong>激光雷达 + 目标点</strong></td>
+<td><strong>占用栅格建图 + 规划 NN</strong></td>
+<td><strong>是</strong></td>
+</tr>
+</tbody>
+</table>
+<h2 id="2">2. 计算原理</h2>
+<h3 id="21">2.1 雷达点从传感器坐标系到世界坐标系</h3>
+<p>激光雷达点在其自身坐标系（<script type="math/tex">x</script> 向前、<script type="math/tex">y</script> 向左），需旋转平移到世界系：</p>
+<p>
+<script type="math/tex; mode=display">
+\begin{bmatrix} p_x^w \\ p_y^w \end{bmatrix}
+= \mathbf R(\psi)\begin{bmatrix} p_x^s \\ p_y^s \end{bmatrix}
++ \begin{bmatrix} x_v \\ y_v \end{bmatrix},\qquad
+\mathbf R(\psi)=\begin{bmatrix}\cos\psi & -\sin\psi \\ \sin\psi & \cos\psi\end{bmatrix}
+</script>
+</p>
+<p>其中 <script type="math/tex">\psi</script> 为车辆航向角，<script type="math/tex">(x_v, y_v)</script> 为车辆位置。</p>
+<h3 id="22">2.2 占用栅格：为什么用对数几率</h3>
+<p>栅格的每个格子记录"被障碍占据"的概率 <script type="math/tex">p\in(0,1)</script>。概率表示在连续更新时有两个问题：
+数值会趋近 0 或 1 导致下溢，且多次观测的概率融合公式复杂。因此改用<strong>对数几率</strong>：</p>
+<p>
+<script type="math/tex; mode=display">
+l = \log\frac{p}{1-p}\ \Longleftrightarrow\ p = \sigma(l) = \frac{1}{1+e^{-l}}
+</script>
+</p>
+<p>观测更新退化为<strong>加法</strong>，这正是贝叶斯滤波在独立观测假设下的结果：</p>
+<p>
+<script type="math/tex; mode=display">
+l_{k} = l_{k-1} + \begin{cases} +l_{\text{hit}} & \text{该格子被命中} \\ +l_{\text{miss}} & \text{射线从该格子穿过} \end{cases}
+\qquad (l_{\text{hit}}>0,\quad l_{\text{miss}}<0)
+</script>
+</p>
+<p>本模块取 <script type="math/tex">l_{\text{hit}}=+0.85</script>、<script type="math/tex">l_{\text{miss}}=-0.4</script>，因此命中时对数几率<strong>增大</strong>
+（更可能被占据），射线穿过时<strong>减小</strong>（更可能空闲）。并把 <script type="math/tex">l</script> 截断在 <script type="math/tex">[-3.0,\ 3.5]</script>
+以免单点噪声把概率永久钉死。初始 <script type="math/tex">l=0 \Rightarrow p=0.5</script> 表示<strong>未知</strong>。</p>
+<div class="admonition note">
+<p class="admonition-title">为什么要标记射线沿途为空闲</p>
+<p>只标记命中点，栅格只能区分"有障碍"和"没扫到"，无法表达"扫到了，那里是空的"。
+把射线沿途的格子标记为 <code>miss</code>（空闲），才能得到真正可用的地图——
+车辆才知道哪条路是可以走的。</p>
+</div>
+<h3 id="23">2.3 栅格原点选取（一个必须避开的陷阱）</h3>
+<p>栅格以<strong>起点为中心</strong>而非世界原点为中心：</p>
+<p>
+<script type="math/tex; mode=display">
+r = \frac{y - y_c}{\Delta} + \frac{N}{2},\qquad
+c = \frac{x - x_c}{\Delta} + \frac{N}{2}
+</script>
+</p>
+<p>其中 <script type="math/tex">(x_c, y_c)</script> 为栅格中心（此处取车辆起点），<script type="math/tex">\Delta=0.5\,\text{m}</script> 为分辨率，
+<script type="math/tex">N=200</script> 为栅格边长。</p>
+<p>如果固定以世界原点为中心且只覆盖 <script type="math/tex">\pm30\,\text{m}</script>，而车辆出生点在世界坐标
+<script type="math/tex">(36,-5)</script>，则车辆落到栅格索引 <script type="math/tex">c=132</script> 处——<strong>超出 <script type="math/tex">0\ldots119</script> 的有效范围</strong>，
+所有雷达命中点都会被丢弃，建图结果恒为空。这类"看起来在跑、其实什么都没做"
+的缺陷无法从日志里直接看出，必须靠单元测试卡住（见第 4 节）。</p>
+<h3 id="24">2.4 规划神经网络</h3>
+<p>输入 5 维状态（<strong>全部归一化到相近尺度</strong>）：</p>
+<p>
+<script type="math/tex; mode=display">
+\mathbf s = \Big[\underbrace{\frac{e_\psi}{\pi}}_{\text{目标方位}},\
+\underbrace{\frac{N_L}{N_{\max}}}_{\text{左障碍密度}},\
+\underbrace{\frac{N_R}{N_{\max}}}_{\text{右障碍密度}},\
+\underbrace{\frac{D_{\min}}{D_{\max}}}_{\text{最近距离}},\
+\underbrace{\frac{\theta_{obs}}{\pi/2}}_{\text{最近障碍方向角}}\Big]^\top
+</script>
+</p>
+<p>其中 <script type="math/tex">\theta_{obs}\in[-\pi/2,\pi/2]</script> 是<strong>最近那个障碍点在传感器系下的方向角</strong>
+（左为正），由该点的 <script type="math/tex">\arctan(y/x)</script> 得到，除以 <script type="math/tex">\pi/2</script> 归一化到 <script type="math/tex">[-1,1]</script>。</p>
+<div class="admonition danger">
+<p class="admonition-title">第 5 维曾经是第 4 维的副本</p>
+<p>早期版本写成 <script type="math/tex">\big[\cdots,\ \frac{D_{\min}}{D_{\max}},\ \frac{D_{\min}}{D_{\max}}\big]</script>，
+第 4、5 维完全相同，等于<strong>只有 4 维有效输入</strong>。后果是网络分不清
+"障碍在正前方"和"障碍在侧前方"，而这两种情况该往哪边打方向恰好相反。
+这一维在数据里看不出来（形状仍是 5 维），只能靠单元测试卡住
+（<code>test_state_bearing_dim_is_not_a_duplicate</code>）。</p>
+</div>
+<p>网络结构：<script type="math/tex">5 \to 64 \to 2</script>，隐藏层 ReLU，输出层 tanh。</p>
+<p>
+<script type="math/tex; mode=display">
+\mathbf h = \mathrm{ReLU}(W_1\mathbf s + b_1),\qquad
+[\tau,\ \delta] = \tanh(W_2\mathbf h + b_2)
+</script>
+</p>
+<p>损失为均方误差：</p>
+<p>
+<script type="math/tex; mode=display">
+\mathcal L = \frac{1}{N}\sum_i\big\|\hat{\mathbf y}_i - \mathbf y_i^*\big\|^2
+</script>
+</p>
+<h3 id="25">2.5 监督标签</h3>
+<p>标签由"朝目标 + 避障"的解析规则生成，避免人工标注。转向由<strong>三项叠加</strong>：</p>
+<p>
+<script type="math/tex; mode=display">
+\delta^* = \mathrm{clip}\Big(\underbrace{\tanh(1.2\,e_\psi)}_{\text{朝目标}}
++ \underbrace{0.6\,(\rho_R - \rho_L)}_{\text{左右密度差}}
+\underbrace{- 0.5\,(1-\tilde D_{\min})\sin\theta_{obs}}_{\text{最近障碍横向排斥}},\ -1,\ 1\Big)
+</script>
+</p>
+<p>
+<script type="math/tex; mode=display">
+\tau^* = \mathrm{clip}\big(0.25 + 0.75\,\tilde D_{\min},\ 0,\ 1\big)
+</script>
+</p>
+<p>其中 <script type="math/tex">\rho_L,\rho_R</script> 为左右障碍密度，<script type="math/tex">\tilde D_{\min}</script> 为归一化最近距离。</p>
+<p>第三项是<strong>横向排斥</strong>：最近障碍偏在左侧（<script type="math/tex">\theta_{obs}>0</script>）时产生向右的排斥，
+越近（<script type="math/tex">\tilde D_{\min}</script> 越小）越强。前两项符号相反且对称、第三项在正前方
+（<script type="math/tex">\theta_{obs}=0</script>）时为 0，因此"正对目标且无障碍 → 转向为 0"，与物理直觉一致。</p>
+<div class="admonition note">
+<p class="admonition-title">第 5 维必须真的被标签用到</p>
+<p>只把 <script type="math/tex">\theta_{obs}</script> 塞进状态、标签却不依赖它，网络从这一维学不到任何东西，
+加了等于没加。所以第 5 维和上面第三项是<strong>成对</strong>的改动，
+由 <code>test_planning_label_uses_obstacle_bearing</code> 保证。</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">油门标签必须用线性输出层</p>
+<p>油门标签 <script type="math/tex">\tau^*\in[0,1]</script>，而 <code>MLPPolicy</code> 的输出为 <script type="math/tex">\tanh\in[-1,1]</script>。
+若直接用它拟合 <script type="math/tex">[0,1]</script> 的目标，网络只能用到一半值域，负值区永远学不到。
+本模块在训练时把油门做 <script type="math/tex">[0,1]\to[-1,1]</script> 映射，推理时再还原。</p>
+</div>
+<h2 id="3">3. 算法流程</h2>
+<div class="highlight"><pre><span></span><code>建图（SLAM 边动边建图）：
+  每帧：LiDAR 点云 → 量程过滤 → 传感器系转世界系
+        → 命中点写占据(+0.85 log-odds)
+        → 射线沿途写空闲(-0.4 log-odds)
+        → 概率 = sigmoid(log_odds)
+
+规划（神经网络）：
+  车辆位姿 + 目标 → 目标方位差 e_psi
+  LiDAR 前方扇区 → 左/右障碍计数 + 最近距离 + 最近障碍方向角
+  → 5 维归一化状态 → 规划 NN → (油门, 转向)
+  → 自行车模型更新位姿
+  → 进入目标 1.5 m 内刹车停车
+</code></pre></div>
+<h2 id="4">4. 源码解析</h2>
+<h3 id="41-mainpy">4.1 <code>main.py</code> — 主入口（三种模式）</h3>
+<table>
+<thead>
+<tr>
+<th>函数 / 类</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>OccupancyGrid</code></td>
+<td>占用栅格类：对数几率存储、坐标互转、贝叶斯更新</td>
+</tr>
+<tr>
+<td><code>lidar_to_world()</code></td>
+<td>雷达点传感器系 → 世界系</td>
+</tr>
+<tr>
+<td><code>build_map_from_scan()</code></td>
+<td>一帧雷达更新地图（命中标记占据、沿途标记空闲）</td>
+</tr>
+<tr>
+<td><code>obs_features()</code></td>
+<td>障碍分布 + 最近障碍方向角 + 目标方位 → 5 维归一化状态</td>
+</tr>
+<tr>
+<td><code>planning_label()</code></td>
+<td>规划监督标签（朝目标 + 避障解析规则）</td>
+</tr>
+<tr>
+<td><code>synth_dataset()</code></td>
+<td>合成规划训练数据</td>
+</tr>
+<tr>
+<td><code>train_planning()</code></td>
+<td>训练规划神经网络并存盘</td>
+</tr>
+<tr>
+<td><code>step_bicycle()</code></td>
+<td>自行车模型一步位姿更新</td>
+</tr>
+<tr>
+<td><code>render_grid_png()</code> / <code>render_prob_png()</code></td>
+<td>占用栅格渲染为 PNG（含渐进建图快照）</td>
+</tr>
+<tr>
+<td><code>render_train_loss_png()</code></td>
+<td>训练损失曲线 PNG</td>
+</tr>
+<tr>
+<td><code>_write_png()</code> / <code>_line()</code></td>
+<td>纯 zlib PNG 编码与 Bresenham 画线（不依赖 Pillow）</td>
+</tr>
+<tr>
+<td><code>_fake_scan()</code></td>
+<td>合成雷达帧（射线与圆/边界求交），供离线取证</td>
+</tr>
+<tr>
+<td><code>run_offline_demo()</code></td>
+<td>离线取证：合成环境建图 + NN 导航 + 导出图</td>
+</tr>
+<tr>
+<td><code>run_carla()</code></td>
+<td>在线：连 CARLA 建图 + NN 导航</td>
+</tr>
+</tbody>
+</table>
+<h3 id="42-carla_mapping_navigationmapping_navigation_nodepy-ros-2">4.2 <code>carla_mapping_navigation/mapping_navigation_node.py</code> — ROS 2 节点</h3>
+<p>发布 <code>/carla/ego_vehicle/occupancy_grid</code>（<code>nav_msgs/OccupancyGrid</code>，RViz 可直接显示）、
+<code>/carla/ego_vehicle/path</code>、<code>/carla/ego_vehicle/odometry</code>、<code>/carla/ego_vehicle/planned_cmd</code>；
+订阅 <code>/carla/ego_vehicle/goal</code> 可在线改目标。地图用 <code>transient_local</code> QoS 发布，
+后加入的 RViz 也能立刻拿到完整地图。</p>
+<h3 id="43-nn_modelspy-numpy">4.3 <code>nn_models.py</code> — 纯 numpy 神经网络库</h3>
+<p><code>MLPPolicy</code> 为本模块规划网络；含前向传播、MSE 损失、反向传播、ReLU/tanh 与 JSON 存取。</p>
+<h3 id="44-carla_commonpy-carla-api">4.4 <code>carla_common.py</code> — CARLA API 封装</h3>
+<p><code>connect()</code>、<code>spawn_vehicle()</code>、<code>make_lidar()</code>、<code>apply_control()</code>、
+<code>get_location()/get_yaw()/get_speed()</code>，同步模式固定步长 0.05 s。</p>
+<h2 id="5">5. 仿真运行步骤</h2>
+<h3 id="51">5.1 支持与测试环境</h3>
+<table>
+<thead>
+<tr>
+<th>组件</th>
+<th>版本 / 说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>操作系统</td>
+<td>Windows 10/11 原生；Ubuntu 20.04（Noetic）/ 22.04（Humble）</td>
+</tr>
+<tr>
+<td>仿真器</td>
+<td>CARLA 0.9.16（服务端运行于有 GPU 的宿主机）</td>
+</tr>
+<tr>
+<td>Python</td>
+<td>3.10+（CARLA 0.9.16 客户端 wheel 为 cp310/cp311/cp312）</td>
+</tr>
+<tr>
+<td>依赖</td>
+<td>仅 <code>numpy</code>（神经网络为纯 numpy 实现，无需 TensorFlow/PyTorch）</td>
+</tr>
+<tr>
+<td>ROS</td>
+<td>ROS 1 Noetic 或 ROS 2 Humble（launch 封装）</td>
+</tr>
+</tbody>
+</table>
+<h3 id="52">5.2 新手路线：从已有示例到本模块</h3>
+<table>
+<thead>
+<tr>
+<th>序号</th>
+<th>做什么</th>
+<th>出处</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>启动 CARLA 服务端</td>
+<td><a href="../../set_up_and_connect_to_carla/">设置并连接到 Carla 模拟器</a> →「启动 Carla 服务器」</td>
+</tr>
+<tr>
+<td>2</td>
+<td>查看宿主机 IP、确认虚拟机连通</td>
+<td>同上 →「使用 Carla 客户端启动 Ego Vehicle」</td>
+</tr>
+<tr>
+<td>—</td>
+<td><strong>★ 在此切换到本模块</strong></td>
+<td>以下与本模块相关</td>
+</tr>
+<tr>
+<td>3</td>
+<td>装 <code>carla</code> 客户端与 <code>numpy</code></td>
+<td><a href="#env-prep">本页 5.3 节</a></td>
+</tr>
+<tr>
+<td>4</td>
+<td>离线训练规划神经网络</td>
+<td><a href="#offline-train">本页 5.5 节</a>（无需 CARLA）</td>
+</tr>
+<tr>
+<td>5</td>
+<td>运行在线建图 + NN 导航</td>
+<td><a href="#online-run">本页 5.8 节</a></td>
+</tr>
+</tbody>
+</table>
+<h3 id="53-0">5.3 步骤 0：环境准备 <span id="env-prep"></span></h3>
+<p>CARLA 服务端的下载安装与启动、宿主机 IP 与端口 2000 的查看、虚拟机网络设置等
+<strong>通用步骤与已有示例完全相同，本文不重复</strong>，请参考
+<a href="../../set_up_and_connect_to_carla/">设置并连接到 Carla 模拟器</a>：</p>
+<table>
+<thead>
+<tr>
+<th>需要做的事</th>
+<th>参考位置</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>启动 CARLA 服务端、选择地图</td>
+<td><a href="../../set_up_and_connect_to_carla/">设置并连接到 Carla 模拟器</a> →「启动 Carla 服务器」</td>
+</tr>
+<tr>
+<td>查看宿主机 IP、填写 <code>host</code> 参数</td>
+<td>同上 →「使用 Carla 客户端启动 Ego Vehicle」</td>
+</tr>
+<tr>
+<td>连接失败、黑屏、<code>numpy</code> 报错排查</td>
+<td>同上 →「常见问题」</td>
+</tr>
+</tbody>
+</table>
+<p>本模块<strong>特有</strong>、需要额外安装的只有 CARLA 0.9.16 的 Python 客户端与 <code>numpy</code>：</p>
+<div class="highlight"><pre><span></span><code>pip3<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>src/ground/carla_mapping_navigation/requirements.txt
+pip3<span class="w"> </span>install<span class="w"> </span>&lt;CARLA&gt;/PythonAPI/carla/dist/carla-0.9.16-cp310-cp310-manylinux_2_31_x86_64.whl
+</code></pre></div>
+<h3 id="54-1ros-2">5.4 步骤 1：编译本功能包（ROS 2）</h3>
+<p>本模块的源代码位于<strong>本仓库</strong>（<code>OpenHUTB/ros2</code>）的
+<code>src/ground/carla_mapping_navigation/</code>。ROS 2 要求功能包放在工作空间的 <code>src/</code> 目录下，
+因此先把本仓库克隆到工作空间的 <code>src/</code>：</p>
+<div class="highlight"><pre><span></span><code>mkdir<span class="w"> </span>-p<span class="w"> </span>~/ros2_ws/src<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>~/ros2_ws/src
+git<span class="w"> </span>clone<span class="w"> </span>https://github.com/OpenHUTB/ros2.git<span class="w">     </span><span class="c1"># 换成你自己的 fork 亦可</span>
+</code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">本模块还没合并进 master 时</p>
+<p>上面的 <code>git clone</code> 拉的是默认分支 <code>master</code>。<strong>在本 PR 被合并之前</strong>，
+<code>master</code> 上还没有 <code>carla_mapping_navigation</code> 这个包，直接 <code>colcon build</code>
+会报找不到包。此时请改用本 PR 的分支：</p>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>-b<span class="w"> </span>carla-homework-03<span class="w"> </span>https://github.com/himyinjun1234/ros2.git
+</code></pre></div>
+<p>合并之后 <code>master</code> 上就有这个包了，按上面的默认写法即可。</p>
+</div>
+<p>克隆后的目录关系如下，<code>colcon build</code> 必须在<strong>工作空间根目录</strong>执行：</p>
+<div class="highlight"><pre><span></span><code>~/ros2_ws/                                   &lt;- 工作空间根目录，colcon 在这里运行
+└── src/
+    └── ros2/                                &lt;- 本仓库（git clone 得到）
+        └── src/ground/
+            └── carla_mapping_navigation/                       &lt;- 本模块源代码
+</code></pre></div>
+<p>因此后文写的 <code>src/ground/carla_mapping_navigation/...</code>，实际路径是
+<code>~/ros2_ws/src/ros2/src/ground/carla_mapping_navigation/...</code>。编译并激活环境：</p>
+<div class="highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>~/ros2_ws
+colcon<span class="w"> </span>build<span class="w"> </span>--packages-select<span class="w"> </span>carla_mapping_navigation<span class="w"> </span>--symlink-install
+<span class="nb">source</span><span class="w"> </span>install/setup.bash
+</code></pre></div>
+<blockquote>
+<p>若本仓库已克隆在别处，把上面的 <code>~/ros2_ws/src/ros2</code> 换成实际路径即可，
+只要保证执行 <code>colcon build</code> 的工作空间根目录下存在 <code>src/</code>。</p>
+</blockquote>
+<h3 id="55-2-carla">5.5 步骤 2：离线训练规划神经网络（无需 CARLA） <span id="offline-train"></span></h3>
+<div class="highlight"><pre><span></span><code>python3<span class="w"> </span>src/ground/carla_mapping_navigation/main.py<span class="w"> </span>--mode<span class="w"> </span>train<span class="w"> </span><span class="se">\</span>
+<span class="w">        </span>--epochs<span class="w"> </span><span class="m">300</span><span class="w"> </span>--out<span class="w"> </span>models/nn_plan.json
+</code></pre></div>
+<p>预期输出：规划 NN 训练 MSE ≈ <strong>0.008</strong>。</p>
+<h3 id="56-3-carla">5.6 步骤 3：离线取证（无 CARLA、无图形界面也能跑通建图+导航）</h3>
+<div class="highlight"><pre><span></span><code>python3<span class="w"> </span>src/ground/carla_mapping_navigation/main.py<span class="w"> </span>--headless<span class="w"> </span>--demo<span class="w"> </span><span class="se">\</span>
+<span class="w">        </span>--epochs<span class="w"> </span><span class="m">300</span><span class="w"> </span>--sim_time<span class="w"> </span><span class="m">60</span><span class="w"> </span>--save_dir<span class="w"> </span>~/shots
+</code></pre></div>
+<p>该模式在合成环境中完成「边动边建图 + NN 规划导航」，导出 5 张图：
+占用栅格地图、渐进建图快照 3 张、训练损失曲线。适合在无 3D 加速的虚拟机中取证。</p>
+<h3 id="57-4-carla">5.7 步骤 4：验证与 CARLA 服务端的连接 <span id="conn-check"></span></h3>
+<p>命令里的 <code>192.168.8.1</code> 是<strong>运行 CARLA 服务端的宿主机（Windows）IP</strong>：
+在宿主机上执行 <code>ipconfig</code>，取 VMware 虚拟网卡（<code>VMnet8</code>）的 IPv4 地址即可
+（本机该地址为 <code>192.168.8.1</code>，虚拟机 <code>ens33</code> 为 <code>192.168.8.131</code>，两者同网段）。
+查看方式与已有示例一致，详见
+<a href="../../set_up_and_connect_to_carla/">设置并连接到 Carla 模拟器</a>
+→「使用 Carla 客户端启动 Ego Vehicle」。</p>
+<div class="highlight"><pre><span></span><code>python3<span class="w"> </span>-c<span class="w"> </span><span class="s2">"import carla; c=carla.Client('192.168.8.1',2000); c.set_timeout(10); print('CONNECT OK:', c.get_world().get_map().name)"</span>
+</code></pre></div>
+<h3 id="58-5-nn">5.8 步骤 5：运行在线建图 + NN 导航 <span id="online-run"></span></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># 模式 A：独立运行（--host 填宿主机 IP）</span>
+python3<span class="w"> </span>src/ground/carla_mapping_navigation/main.py<span class="w"> </span>--mode<span class="w"> </span>run<span class="w"> </span><span class="se">\</span>
+<span class="w">        </span>--host<span class="w"> </span><span class="m">192</span>.168.8.1<span class="w"> </span>--model<span class="w"> </span>models/nn_plan.json<span class="w"> </span>--goal<span class="w"> </span><span class="s2">"20,8"</span><span class="w"> </span>--sim_time<span class="w"> </span><span class="m">40</span>
+
+<span class="c1"># 模式 B：ROS 2 Humble</span>
+ros2<span class="w"> </span>launch<span class="w"> </span>carla_mapping_navigation<span class="w"> </span>main.launch.py<span class="w"> </span>host:<span class="o">=</span><span class="m">192</span>.168.8.1<span class="w"> </span>goal:<span class="o">=</span><span class="s2">"20,8"</span>
+
+<span class="c1"># 模式 C：ROS 1 Noetic —— 入口用 main.sh（会自动挑 python3.10）</span>
+<span class="c1">#   roslaunch 只能按 main.py 的 shebang 执行它，而 Noetic 的 python3 是 3.8，</span>
+<span class="c1">#   装不上 CARLA 0.9.16 的 cp310+ wheel，补了可执行位也会卡在 import carla。</span>
+<span class="c1">#   若系统 python3 本身已是 3.10+，也可用：</span>
+<span class="c1">#   roslaunch carla_mapping_navigation main.launch host:=192.168.8.1</span>
+bash<span class="w"> </span>src/ground/carla_mapping_navigation/main.sh<span class="w"> </span>--host<span class="w"> </span><span class="m">192</span>.168.8.1<span class="w"> </span>--goal<span class="w"> </span><span class="m">20</span>,8
+</code></pre></div>
+<p>也可用一键脚本：<code>bash main.sh --host 192.168.8.1</code>。</p>
+<p>在 RViz 中可视化占用栅格地图：</p>
+<div class="highlight"><pre><span></span><code>ros2<span class="w"> </span>run<span class="w"> </span>rviz2<span class="w"> </span>rviz2<span class="w"> </span>-d<span class="w"> </span><span class="k">$(</span>ros2<span class="w"> </span>pkg<span class="w"> </span>prefix<span class="w"> </span>carla_mapping_navigation<span class="k">)</span>/share/carla_mapping_navigation/config/mapping.rviz
+</code></pre></div>
+<p>若没有现成 rviz 配置，也可手动添加 <code>Map</code> 显示并订阅 <code>/carla/ego_vehicle/occupancy_grid</code>，
+以及添加 <code>Path</code> 显示订阅 <code>/carla/ego_vehicle/path</code>。</p>
+<h3 id="59">5.9 运行效果</h3>
+<p><strong>占用栅格地图</strong>（深色=障碍，浅色=空闲可通行，中灰=未观测；红色为车辆轨迹，绿色为目标）：</p>
+<p><img alt="激光雷达占用栅格建图结果" src="../../img/ground/carla_map_occupancy_map.png"/></p>
+<p><strong>渐进建图过程</strong>（体现 SLAM"边动边建图"：地图随行驶逐步成形，
+左上角进度条对应该快照的仿真时刻）：</p>
+<table>
+<thead>
+<tr>
+<th>进度 1（已知 3.4%）</th>
+<th>进度 2（已知 18.1%）</th>
+<th>进度 3（已知 26.8%）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><img alt="建图进度 1：起始阶段地图几乎空白" src="../../img/ground/carla_map_map_progress_1.png"/></td>
+<td><img alt="建图进度 2：行驶途中地图扩展到中途范围" src="../../img/ground/carla_map_map_progress_2.png"/></td>
+<td><img alt="建图进度 3：接近目标时地图基本成形" src="../../img/ground/carla_map_map_progress_3.png"/></td>
+</tr>
+</tbody>
+</table>
+<p><strong>动图：建图与导航全过程</strong>（26 帧，每帧间隔 0.25 s，96 KB。地图随车辆行驶逐帧长出来，
+红色轨迹与绿色目标点同步推进，左上角蓝色进度条对应该帧的仿真时刻）：</p>
+<p><img alt="激光雷达建图与神经网络规划导航动态演示" src="../../img/ground/carla_map_progress.gif"/></p>
+<p>已知区域占比随时间增长（实测）：<strong>3.4% → 18.1% → 26.8%</strong>，最终 <strong>27.6%</strong>。</p>
+<p><strong>规划神经网络训练损失曲线</strong>：</p>
+<p><img alt="规划神经网络 MSE 下降曲线" src="../../img/ground/carla_map_plan_loss.png"/></p>
+<p>终端状态输出示例（节选）：</p>
+<div class="highlight"><pre><span></span><code>== 训练规划 NN：5 维状态(目标方位+障碍分布) → (前进量, 转向) ==
+  epoch  200 loss=0.0075 train_acc=0.000
+规划 NN 训练 MSE = 0.00751
+
+[t=  0.0s] pos=(  36.0,  -5.0) 距目标=20.62m NN(油门=0.92, 转向=-0.07) 障碍(L0/R0, 8.0m, 方位+0°) 占据格=86
+[t=  2.5s] pos=(  30.3,   3.4) 距目标=11.47m NN(油门=0.72, 转向=+0.27) 障碍(L14/R4, 4.4m, 方位+14°) 占据格=728
+[t=  5.0s] pos=(  23.2,   4.9) 距目标= 4.58m NN(油门=0.51, 转向=-0.83) 障碍(L25/R0, 2.7m, 方位+46°) 占据格=1108
+
+[到达] t=6.4s 抵达目标 (20.0,8.0)，停车。
+
+渐进建图已知区域占比：3.4% → 18.1% → 26.8%（最终 27.6%）
+
+---- 建图结果 ----
+占据格数        = 1242
+空闲格数        = 9288
+已知区域比例    = 27.6%
+栅格分辨率      = 0.5 m/格，覆盖 100 m × 100 m
+栅格中心（起点）= (36.0, -5.0)
+车辆最终位置    = (21.01, 7.00)，轨迹点数 128
+距目标最近距离  = 1.424 m（判定阈值 1.5 m）
+与障碍最近距离  = 0.72 m（未发生碰撞）
+到达耗时        = 6.4 s
+</code></pre></div>
+<p>第 3 行那句日志正好演示了第 5 维的用处：障碍在左前方 46°、2.7 m 处，
+网络输出转向 <strong>-0.83</strong>（急向右打），最终<strong>与障碍最近 0.72 m、未发生碰撞</strong>。
+如果第 5 维还是距离的副本，网络只知道"2.7 m 处有障碍"却不知道在哪一侧，
+就无法决定往哪边让。</p>
+<h3 id="510">5.10 常见问题</h3>
+<p><strong>Q1：建图结果一直是空的 / 占据格数为 0？</strong>
+先检查车辆是否落在栅格范围内。默认栅格以起点为中心、覆盖 100 m × 100 m，
+本模块已保证起点在栅格中心。若自行修改了 <code>GRID_N</code> 或 <code>GRID_M</code>，请确认覆盖范围够大。
+可用 <code>python3 test/test_mapping_logic.py</code> 快速回归验证。</p>
+<p><strong>Q2：<code>--mode run</code> 报"缺少 carla 模块"？</strong>
+需安装 CARLA 0.9.16 的 Python 客户端 wheel，见 <a href="#env-prep">5.3 节</a>。
+若只想验证算法，可改用 <code>--headless --demo</code>（不需要 CARLA）。</p>
+<p><strong>Q3：RViz 里地图是空的？</strong>
+地图话题用 <code>transient_local</code> QoS 发布，但 RViz 的 <code>Map</code> 显示需把
+<code>Durability Policy</code> 设为 <code>Transient Local</code>，否则收不到已发布的地图。</p>
+<p><strong>Q4：车辆撞上障碍物？</strong>
+合成数据训练的规划网络只用"左右障碍密度 + 最近障碍方向角"这 5 维，属于教学演示级别：
+它知道障碍在哪一侧、有多远，但<strong>不做轨迹预测</strong>，对正前方的障碍也没有固定的绕行方向
+（<script type="math/tex">\theta_{obs}=0</script> 时横向排斥项为 0，靠左右密度差打破对称）。
+若要更强的避障，需要扩到图像/点云输入并用真实数据训练。
+离线取证模式里实测与障碍最近 0.72 m、未发生碰撞，可作参考。</p>
+<h2 id="6">6. 性能评价</h2>
+<h3 id="61">6.1 指标定义</h3>
+<p><strong>已知区域比例（建图覆盖率）</strong>：概率明显偏离 0.5 的格子（<script type="math/tex">p>0.55</script> 或 <script type="math/tex">p<0.45</script>）
+占栅格总数的比例，反映"地图已经看清了多少"：</p>
+<p>
+<script type="math/tex; mode=display">
+\text{Coverage} = \frac{1}{N^2}\sum_{i,j}\mathbb{1}\big[p_{ij}>0.55 \lor p_{ij}<0.45\big]
+</script>
+</p>
+<p><strong>占据格数</strong>：<script type="math/tex">p>0.6</script> 的格子数，反映地图中障碍物的丰富程度。</p>
+<p><strong>空闲格数</strong>：<script type="math/tex">p<0.4</script> 的格子数，即可通行区域。</p>
+<div class="admonition note">
+<p class="admonition-title">三个指标的阈值不同，不能直接相加</p>
+<p>已知区域用的是 <script type="math/tex">p>0.55</script> 或 <script type="math/tex">p<0.45</script>，比占据格数（<script type="math/tex">p>0.6</script>）和空闲格数
+（<script type="math/tex">p<0.4</script>）都宽，因此恒有「占据格数 + 空闲格数 ≤ 已知格数」。</p>
+<p>以 6.2 的实测值为例：<script type="math/tex">(1242+9288)/200^2 = 26.33\%</script>，而已知区域比例是 <script type="math/tex">27.6\%</script>，
+差额约 1.27%（约 500 格）落在 <script type="math/tex">0.4\sim0.45</script> 与 <script type="math/tex">0.55\sim0.6</script> 之间，
+是尚未被明确判定的格子——不是数据算错了。</p>
+</div>
+<p><strong>导航精度</strong>：车辆到目标的<strong>最近距离</strong> <script type="math/tex">D_{\min}</script>，</p>
+<p>
+<script type="math/tex; mode=display">
+D_{\min} = \min_k \big\|\mathbf p_k - \mathbf p_{\text{goal}}\big\|
+</script>
+</p>
+<p><strong>规划损失</strong>：训练集 MSE，
+<script type="math/tex"> \mathcal L = \frac{1}{N}\sum_i\|\hat{\mathbf y}_i - \mathbf y_i^*\|^2</script>。</p>
+<h3 id="62">6.2 实测结果（离线取证模式，本机实测）</h3>
+<table>
+<thead>
+<tr>
+<th>指标</th>
+<th>数值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>规划 NN 训练 MSE</td>
+<td><strong>0.00751</strong></td>
+</tr>
+<tr>
+<td>占据格数</td>
+<td>1242</td>
+</tr>
+<tr>
+<td>空闲格数</td>
+<td>9288</td>
+</tr>
+<tr>
+<td>已知区域比例</td>
+<td>27.6%</td>
+</tr>
+<tr>
+<td>导航最近距离</td>
+<td><strong>1.424 m</strong>（阈值 1.5 m）</td>
+</tr>
+<tr>
+<td>与障碍最近距离</td>
+<td><strong>0.72 m</strong>（未发生碰撞）</td>
+</tr>
+<tr>
+<td>到达耗时</td>
+<td>6.4 s</td>
+</tr>
+<tr>
+<td>轨迹点数</td>
+<td>128</td>
+</tr>
+<tr>
+<td>单元测试</td>
+<td><strong>30 PASS / 0 FAIL</strong></td>
+</tr>
+</tbody>
+</table>
+<h3 id="63">6.3 调优过程记录</h3>
+<table>
+<thead>
+<tr>
+<th>优化项</th>
+<th>优化前</th>
+<th>优化后</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>栅格中心改为以起点为中心</td>
+<td>车在栅格<strong>外</strong>（索引 132 &gt; 119），建图恒为空</td>
+<td>车在栅格中心，正常建图</td>
+<td>最严重缺陷，加单元测试卡死</td>
+</tr>
+<tr>
+<td>状态第 5 维改归一化</td>
+<td>原始米数 0.3~8.0，与其余维差 8 倍</td>
+<td>全部落在 [0,1]</td>
+<td>消除量纲失衡</td>
+</tr>
+<tr>
+<td><strong>状态第 5 维改为障碍方向角</strong></td>
+<td>是第 4 维的副本，实际只有 4 维输入</td>
+<td>
+<script type="math/tex">\theta_{obs}/(\pi/2)</script>，且标签用它做横向排斥</td>
+<td>网络才能分清障碍在正前方还是侧前方</td>
+</tr>
+<tr>
+<td><strong>射线求交处理"传感器在圆内"</strong></td>
+<td>车已开进障碍物，日志却报"无障碍"</td>
+<td>近交点无效时改用远交点</td>
+<td>离线取证里的避障才真的被演示出来</td>
+</tr>
+<tr>
+<td>加入射线沿途空闲标记</td>
+<td>只知"有障碍/没扫到"</td>
+<td>区分占据/空闲/未知</td>
+<td>地图才可用于通行判断</td>
+</tr>
+<tr>
+<td>油门标签值域对齐</td>
+<td>
+<script type="math/tex">\tanh</script> 输出只用一半值域</td>
+<td>训练时映射到 <script type="math/tex">[-1,1]</script>，推理还原</td>
+<td>避免负值区永久学不到</td>
+</tr>
+<tr>
+<td>对称化避障偏置</td>
+<td>障碍项不对称会产生常值偏转</td>
+<td>
+<script type="math/tex">\rho_R-\rho_L</script> 对称</td>
+<td>无障碍时转向归零</td>
+</tr>
+<tr>
+<td>对数几率截断</td>
+<td>单点噪声可能钉死概率</td>
+<td>截断到 <script type="math/tex">[-3.0, 3.5]</script>
+</td>
+<td>抗噪</td>
+</tr>
+<tr>
+<td>加入渐进建图快照</td>
+<td>只有最终地图</td>
+<td>3 张中间快照 + 时刻进度条</td>
+<td>直观证明"边动边建图"</td>
+</tr>
+</tbody>
+</table>
+<h3 id="64">6.4 结论</h3>
+<ul>
+<li><strong>建图有效性</strong>：占用栅格在 6.4 s 内覆盖 27.6% 的已知区域，识别出 1242 个占据格，
+  3 张渐进快照显示已知区域从 3.4% 单调增长到 26.8%（最终 27.6%），
+  证实<strong>边动边建图</strong>成立。</li>
+<li><strong>导航有效性</strong>：规划 NN 在合成环境中 6.4 s 内把车带到距目标 1.424 m（阈值 1.5 m），
+  满足到达判定；全程与障碍最近 0.72 m、未发生碰撞，说明"状态 → 油门/转向"
+  映射被有效学到。</li>
+<li><strong>神经网络必要性</strong>：规划环节完全由 NN 输出，训练 MSE 0.008，
+  推理时无需解析求解；后续可用真实驾驶数据替换解析标签，直接迁移到数据驱动规划。</li>
+</ul></div>
+</div>
+</div><footer>
+<div aria-label="Footer Navigation" class="rst-footer-buttons" role="navigation">
+<a class="btn btn-neutral float-left" href="../waypoint/" title="路径点发布器"><span class="icon icon-circle-arrow-left"></span> 前一页</a>
+<a class="btn btn-neutral float-right" href="../ad_agent/" title="自动驾驶代理">后一页 <span class="icon icon-circle-arrow-right"></span></a>
+</div>
+<hr/>
+<div role="contentinfo">
+<!-- Copyright etc -->
+<p>OpenHUTB 版权所有 © 2026</p>
+</div>
+</footer>
+</div>
+</div>
+</section>
+</div>
+<div aria-label="Versions" class="rst-versions" role="note">
+<span class="rst-current-version" data-toggle="rst-current-version">
+<span>
+<a href="https://github.com/OpenHUTB/ros2" style="color: #fcfcfc">OpenHUTB</a>
+</span>
+<span><a href="../waypoint/" style="color: #fcfcfc">« 前一页</a></span>
+<span><a href="../ad_agent/" style="color: #fcfcfc">后一页 »</a></span>
+</span>
+</div>
+<script src="../../js/jquery-3.6.0.min.js"></script>
+<script>var base_url = "../..";</script>
+<script src="../../js/theme_extra.js"></script>
+<script src="../../js/theme.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.2.7/raphael.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-sequence-diagrams/1.0.6/sequence-diagram-min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/flowchart/1.6.5/flowchart.min.js"></script>
+<script src="../../js/umlconvert.js"></script>
+<script src="../../search/main.js"></script>
+<script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+</body>
+</html>

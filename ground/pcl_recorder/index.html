@@ -91,7 +91,7 @@
 </li>
 </ul>
 <p class="caption"><span class="caption-text">地面载具</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../../set_up_and_connect_to_carla/">手动控制</a>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../carla_spawn_objects/">生成对象</a>
@@ -105,6 +105,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../r2d2_cruise/">R2D2小车 自动巡航</a>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../waypoint/">路径点发布器</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../carla_mapping_navigation/">激光雷达建图与神经网络规划导航</a>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../ad_agent/">自动驾驶代理</a>
 </li>
@@ -123,6 +125,26 @@
 <li class="toctree-l1"><a class="reference internal" href="../carla_tsr_ros/">交通标志识别 ROS 封装</a>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../vehicle_pygame_teleop/">车辆键盘遥操作与二维模拟</a>
+</li>
+<li class="toctree-l1 current"><a class="reference internal current" href="#">点云地图创建</a>
+<ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="#_2">参考</a>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#_3">拓展：自行实现「占用栅格建图 + 神经网络规划导航」</a>
+<ul>
+<li class="toctree-l3"><a class="reference internal" href="#_4">与本文示例的区别</a>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#_5">复用本文的配置步骤</a>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#_6">本拓展新增的内容</a>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#_7">运行本拓展模块</a>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#_8">实测结果</a>
+</li>
+</ul>
+</li>
+</ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../mujoco_diff_drive_slip_compensation/">MuJoCo 差速小车轮滑感知与轨迹补偿</a>
 </li>
@@ -241,6 +263,7 @@
 <div class="rst-content"><div aria-label="breadcrumbs navigation" role="navigation">
 <ul class="wy-breadcrumbs">
 <li><a aria-label="Docs" class="icon icon-home" href="../.."></a></li>
+<li class="breadcrumb-item">地面载具</li>
 <li class="breadcrumb-item active">点云地图创建</li>
 <li class="wy-breadcrumbs-aside">
 <a href="https://github.com/OpenHUTB/ros2/edit/master/docs/ground/pcl_recorder.md"> 编辑页面</a>
@@ -251,12 +274,165 @@
 <div class="document" itemscope="itemscope" itemtype="http://schema.org/Article" role="main">
 <div class="section" itemprop="articleBody">
 <div><h1 id="_1">点云地图创建</h1>
+<p>本文介绍 CARLA ROS Bridge 中的<strong>点云地图创建</strong>：通过 PCL 记录器把激光雷达扫到的
+三维点云累积保存下来，供离线查看与分析，属于 <code>carla_ros_bridge</code> 的既有功能。</p>
 <h2 id="_2">参考</h2>
 <ul>
 <li><a href="https://openhutb.github.io/doc/ros_documentation/">PCL 记录器</a></li>
-</ul></div>
+</ul>
+<h2 id="_3">拓展：自行实现「占用栅格建图 + 神经网络规划导航」</h2>
+<p>本文的点云地图创建只负责<strong>保存</strong>点云，既不做概率化的地图表达，也不含导航功能。
+下面是在该功能基础上<strong>自主实现</strong>的一套「激光雷达建图 + 神经网络规划导航」闭环，
+代码位于
+<a href="https://github.com/OpenHUTB/ros2/tree/master/src/ground/carla_mapping_navigation"><code>src/ground/carla_mapping_navigation</code></a>，
+详细介绍（计算原理、源码解析、性能评价）见
+<a href="../carla_mapping_navigation/">CARLA 激光雷达建图与神经网络规划导航</a>。</p>
+<h3 id="_4">与本文示例的区别</h3>
+<table>
+<thead>
+<tr>
+<th>对比项</th>
+<th>本文示例（点云地图创建）</th>
+<th>本拓展模块</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>技术路线</td>
+<td><code>carla_ros_bridge</code> 的 PCL 记录器</td>
+<td>CARLA Python API 直连 + 自研建图/规划节点</td>
+</tr>
+<tr>
+<td>是否依赖 ros-bridge</td>
+<td>必须编译并运行 ros-bridge</td>
+<td><strong>不需要</strong>，仅需 <code>carla</code> Python 客户端</td>
+</tr>
+<tr>
+<td>地图形式</td>
+<td>3D 点云（<code>.pcd</code> 文件，离线查看）</td>
+<td>2D 占用栅格（<code>nav_msgs/OccupancyGrid</code>，RViz 实时显示）</td>
+</tr>
+<tr>
+<td>建图时机</td>
+<td>先录后看（离线）</td>
+<td><strong>边动边建图</strong>（SLAM 理念，行驶中实时更新）</td>
+</tr>
+<tr>
+<td>概率更新</td>
+<td>无（纯点云累积）</td>
+<td><strong>贝叶斯对数几率更新</strong>，区分占据 / 空闲 / 未知</td>
+</tr>
+<tr>
+<td>导航规划</td>
+<td><strong>无</strong>（只有建图）</td>
+<td><strong>规划神经网络</strong>输出油门与转向，驶向目标并避障</td>
+</tr>
+<tr>
+<td>规划算法性质</td>
+<td>—</td>
+<td><strong>神经网络</strong>（纯 numpy 反向传播，可训练）</td>
+</tr>
+<tr>
+<td>无 CARLA / 无图形界面时</td>
+<td>无法运行</td>
+<td><code>--headless --demo</code> 离线自证并导出地图与曲线</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_5">复用本文的配置步骤</h3>
+<p>CARLA 服务端的启动、宿主机 IP 与端口 2000 的查看、虚拟机网络设置等步骤
+<strong>与已有示例完全一致，此处不再重复</strong>，请参考
+<a href="../../set_up_and_connect_to_carla/">设置并连接到 Carla 模拟器</a> 的
+「启动 Carla 服务器」与「使用 Carla 客户端启动 Ego Vehicle」小节；
+连接失败的排查见同一篇的「常见问题」小节。</p>
+<div class="admonition warning">
+<p class="admonition-title">不要从头到尾照做已有示例</p>
+<p>已有示例中的「设置 Carla ROS Bridge」「使用 rviz 进行可视化」等小节属于
+<strong>ros-bridge 路线</strong>（需要 catkin 编译 ros-bridge）。本拓展模块<strong>不依赖 ros-bridge</strong>，
+这些步骤可以跳过。</p>
+</div>
+<h3 id="_6">本拓展新增的内容</h3>
+<ol>
+<li><strong>占用栅格建图</strong>：把三维点云投影到 2D 占用栅格，用<strong>对数几率</strong>表达占据概率，
+   命中标记占据、射线沿途标记空闲，输出可直接用于通行的地图。</li>
+<li><strong>SLAM 边动边建图</strong>：车辆行驶过程中实时更新地图，并导出渐进建图快照
+   （实测已知区域从 3.4% 单调增长到 27.6%）。</li>
+<li><strong>规划神经网络</strong>：状态（目标方位 + 障碍左右分布 + 最近距离）→ (油门, 转向)，
+   MLP 策略网络（5→64→2）。</li>
+<li><strong>避障解析标签</strong>：训练标签由"朝目标 + 避障"规则生成，两侧障碍项符号相反且对称，
+   保证无障碍时转向归零，无需人工标注。</li>
+<li><strong>RViz 实时可视化</strong>：发布 <code>nav_msgs/OccupancyGrid</code>，附带现成 rviz 配置。</li>
+<li><strong>离线取证模式</strong>：<code>--headless --demo</code> 无需 CARLA、无需图形界面即可跑通全链路。</li>
+</ol>
+<h3 id="_7">运行本拓展模块</h3>
+<p>除本文所需环境外，只需补装 CARLA 0.9.16 的 Python 客户端
+（神经网络为纯 numpy 实现，无需 TensorFlow/PyTorch）：</p>
+<div class="highlight"><pre><span></span><code>pip3<span class="w"> </span>install<span class="w"> </span>&lt;CARLA&gt;/PythonAPI/carla/dist/carla-0.9.16-cp310-cp310-manylinux_2_31_x86_64.whl
+</code></pre></div>
+<p>离线训练规划神经网络（<strong>不需要 CARLA</strong>）：</p>
+<div class="highlight"><pre><span></span><code>python3<span class="w"> </span>src/ground/carla_mapping_navigation/main.py<span class="w"> </span>--mode<span class="w"> </span>train<span class="w"> </span>--epochs<span class="w"> </span><span class="m">300</span>
+</code></pre></div>
+<p>在线建图 + NN 导航（<code>--host</code> 的填法与本文一致：填宿主机 IP）：</p>
+<div class="highlight"><pre><span></span><code>python3<span class="w"> </span>src/ground/carla_mapping_navigation/main.py<span class="w"> </span>--mode<span class="w"> </span>run<span class="w"> </span><span class="se">\</span>
+<span class="w">        </span>--host<span class="w"> </span><span class="m">192</span>.168.8.1<span class="w"> </span>--goal<span class="w"> </span><span class="s2">"20,8"</span><span class="w"> </span>--sim_time<span class="w"> </span><span class="m">40</span>
+</code></pre></div>
+<p>使用 launch 启动（ROS 2 / ROS 1）：</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># ROS 2</span>
+ros2<span class="w"> </span>launch<span class="w"> </span>carla_mapping_navigation<span class="w"> </span>main.launch.py<span class="w"> </span>host:<span class="o">=</span><span class="m">192</span>.168.8.1<span class="w"> </span>goal:<span class="o">=</span><span class="s2">"20,8"</span>
+<span class="c1"># ROS 1</span>
+roslaunch<span class="w"> </span>carla_mapping_navigation<span class="w"> </span>main.launch<span class="w"> </span>host:<span class="o">=</span><span class="m">192</span>.168.8.1<span class="w"> </span>goal:<span class="o">=</span><span class="s2">"20,8"</span>
+</code></pre></div>
+<p>在 RViz 中查看占用栅格地图：</p>
+<div class="highlight"><pre><span></span><code>ros2<span class="w"> </span>run<span class="w"> </span>rviz2<span class="w"> </span>rviz2<span class="w"> </span>-d<span class="w"> </span><span class="k">$(</span>ros2<span class="w"> </span>pkg<span class="w"> </span>prefix<span class="w"> </span>carla_mapping_navigation<span class="k">)</span>/share/carla_mapping_navigation/config/mapping.rviz
+</code></pre></div>
+<h3 id="_8">实测结果</h3>
+<p>本机离线取证模式实测（<code>--epochs 300 --sim_time 60</code>，无需 CARLA）：</p>
+<table>
+<thead>
+<tr>
+<th>指标</th>
+<th>数值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>规划 NN 训练 MSE</td>
+<td>0.00751</td>
+</tr>
+<tr>
+<td>占据格数 / 空闲格数</td>
+<td>1242 / 9288</td>
+</tr>
+<tr>
+<td>已知区域比例</td>
+<td>27.6%</td>
+</tr>
+<tr>
+<td>导航最近距离</td>
+<td>1.424 m（阈值 1.5 m）</td>
+</tr>
+<tr>
+<td>与障碍最近距离</td>
+<td>0.72 m（未碰撞）</td>
+</tr>
+<tr>
+<td>到达耗时</td>
+<td>6.4 s</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="激光雷达占用栅格建图结果" src="../../img/ground/carla_map_occupancy_map.png"/></p>
+<p>渐进建图过程（体现"边动边建图"，已知区域 3.4% → 18.1% → 26.8%）：</p>
+<p><img alt="建图进度 1" src="../../img/ground/carla_map_map_progress_1.png"/></p>
+<p><img alt="建图进度 3" src="../../img/ground/carla_map_map_progress_3.png"/></p>
+<p>完整的调优过程与性能评价见
+<a href="../carla_mapping_navigation/">CARLA 激光雷达建图与神经网络规划导航</a> 第 6 节。</p></div>
 </div>
 </div><footer>
+<div aria-label="Footer Navigation" class="rst-footer-buttons" role="navigation">
+<a class="btn btn-neutral float-left" href="../vehicle_pygame_teleop/" title="车辆键盘遥操作与二维模拟"><span class="icon icon-circle-arrow-left"></span> 前一页</a>
+<a class="btn btn-neutral float-right" href="../mujoco_diff_drive_slip_compensation/" title="MuJoCo 差速小车轮滑感知与轨迹补偿">后一页 <span class="icon icon-circle-arrow-right"></span></a>
+</div>
 <hr/>
 <div role="contentinfo">
 <!-- Copyright etc -->
@@ -272,6 +448,8 @@
 <span>
 <a href="https://github.com/OpenHUTB/ros2" style="color: #fcfcfc">OpenHUTB</a>
 </span>
+<span><a href="../vehicle_pygame_teleop/" style="color: #fcfcfc">« 前一页</a></span>
+<span><a href="../mujoco_diff_drive_slip_compensation/" style="color: #fcfcfc">后一页 »</a></span>
 </span>
 </div>
 <script src="../../js/jquery-3.6.0.min.js"></script>
